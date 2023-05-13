@@ -41,15 +41,20 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'phonenumber_field',
+    'rest_framework',
 
     'product.apps.ProductConfig',
     'basket.apps.BasketConfig',
     'order.apps.OrderConfig',
+    'api.apps.ApiConfig',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+
+    'basket.middleware.BasketMiddleware',
+
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -129,3 +134,11 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+REST_FRAMEWORK = {
+    'EXCEPTION_HANDLER': 'api.exceptions.django_error_handler'
+}
+
+MY_BASKET_COOKIE_LIFETIME = 7 * 24 * 60 * 60
+MY_BASKET_COOKIE_SECURE = False
+MY_BASKET_COOKIE_OPEN = 'open_basket'

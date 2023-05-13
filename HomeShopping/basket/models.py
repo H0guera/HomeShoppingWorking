@@ -110,7 +110,7 @@ class Basket(models.Model):
         return total
 
     @property
-    def total_excl(self):
+    def total_price(self):
         return self._total_price('line_price')
 
     @property
