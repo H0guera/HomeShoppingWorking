@@ -6,10 +6,16 @@ from api.views.admin.product import ProductClassAdminList, ProductClassAdminDeta
     ProductStockRecordsAdminDetail, ProductCategoryList, ProductCategoryDetail
 from api.views.basic import BasketList, BasketDetail
 from api.views.basket import BasketView, AddProductView, LineList, LineDetail
+from api.views.checkout import CheckoutView, OrderList, OrderDetail, OrderLineList, OrderLineDetail
 from api.views.login import UserDetail, LoginView
 from api.views.product import CategoryList, CategoryDetail, ProductStockRecords, ProductStockRecordDetail, ProductList, \
     ProductDetail
 from api.views.root import api_root
+
+
+class OrderLineAttributeDetail:
+    pass
+
 
 urlpatterns = [
     path("", api_root, name="api-root"),
@@ -35,6 +41,16 @@ urlpatterns = [
     path("categories/", CategoryList.as_view(), name="category-list"),
     path("categories/<int:pk>/", CategoryDetail.as_view(), name="category-detail"),
     path("users/<int:pk>/", UserDetail.as_view(), name="user-detail"),
+    path("checkout/", CheckoutView.as_view(), name="api-checkout"),
+    path("orders/", OrderList.as_view(), name="order-list"),
+    path("orders/<int:pk>/", OrderDetail.as_view(), name="order-detail"),
+    path("orders/<int:pk>/lines/", OrderLineList.as_view(), name="order-lines-list"),
+    path("orderlines/<int:pk>/", OrderLineDetail.as_view(), name="order-lines-detail"),
+    path(
+        "orderlineattributes/<int:pk>/",
+        OrderLineAttributeDetail.as_view(),
+        name="order-lineattributes-detail",
+    ),
 ]
 
 admin_urlpatterns = [
