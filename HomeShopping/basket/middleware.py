@@ -93,7 +93,7 @@ class BasketMiddleware:
         cookie_key = self.get_cookie_key(request)
         print(cookie_key)
         cookie_basket = self.get_cookie_basket(cookie_key, request)  # manager)
-        print(cookie_basket)
+        #print(cookie_basket)
         if hasattr(request, 'user') and request.user.is_authenticated:
             # Signed-in user: if they have a cookie basket too, it means
             # that they have just signed in and we need to merge their cookie

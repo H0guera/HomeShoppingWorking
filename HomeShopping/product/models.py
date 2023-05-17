@@ -1,3 +1,4 @@
+from django.conf.global_settings import AUTH_USER_MODEL
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, RegexValidator
 from django.db import models
@@ -156,11 +157,11 @@ class ProductAttribute(models.Model):
         ],
     )
     # Attribute types
-    TEXT = "text"
-    INTEGER = "integer"
+    TEXT = 'text'
+    INTEGER = 'integer'
     TYPE_CHOICES = (
-        (TEXT, "Text"),
-        (INTEGER, "Integer"),
+        (TEXT, 'Text'),
+        (INTEGER, 'Integer'),
     )
     type = models.CharField(
         choices=TYPE_CHOICES,
@@ -243,7 +244,7 @@ class ProductAttributeValue(models.Model):
         Gets a string representation of both the attribute and it's value,
         used e.g in product summaries.
         """
-        return "%s: %s" % (self.attribute.name, self.value_as_text)
+        return '%s: %s' % (self.attribute.name, self.value_as_text)
 
     @property
     def value_as_text(self):
@@ -260,19 +261,24 @@ class StockRecord(models.Model):
     product = models.ForeignKey(
         'product',
         on_delete=models.CASCADE,
-        related_name="stockrecords",
-        verbose_name="product",
+        related_name='stockrecords',
+        verbose_name='product',
+    )
+    owner = models.ForeignKey(
+        AUTH_USER_MODEL,
+        related_name='stockrecords',
+        on_delete=models.CASCADE,
     )
     partner_sku = models.CharField(max_length=55, unique=True)
     price = models.FloatField(validators=(MinValueValidator(limit_value=0.01),))
     num_in_stock = models.PositiveIntegerField(
-        "Number in stock", blank=True, null=True)
+        'Number in stock', blank=True, null=True)
 
     low_stock_threshold = models.PositiveIntegerField(
-        "Low Stock Threshold", blank=True, null=True)
+        'Low Stock Threshold', blank=True, null=True)
 
-    date_created = models.DateTimeField("Date created", auto_now_add=True)
-    date_updated = models.DateTimeField("Date updated", auto_now=True,
+    date_created = models.DateTimeField('Date created', auto_now_add=True)
+    date_updated = models.DateTimeField('Date updated', auto_now=True,
                                         db_index=True)
 
     def __str__(self):

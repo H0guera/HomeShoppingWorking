@@ -6,11 +6,14 @@ from api.views.admin.product import ProductClassAdminList, ProductClassAdminDeta
     ProductStockRecordsAdminDetail, ProductCategoryList, ProductCategoryDetail
 from api.views.basic import BasketList, BasketDetail
 from api.views.basket import BasketView, AddProductView, LineList, LineDetail
-from api.views.login import UserDetail
+from api.views.login import UserDetail, LoginView
 from api.views.product import CategoryList, CategoryDetail, ProductStockRecords, ProductStockRecordDetail, ProductList, \
     ProductDetail
+from api.views.root import api_root
 
 urlpatterns = [
+    path("", api_root, name="api-root"),
+    path("login/", LoginView.as_view(), name="api-login"),
     path('basket', BasketView.as_view(), name='api-basket'),
     path('add_product', AddProductView.as_view(), name='add-product'),
     path('baskets', BasketList.as_view(), name='baskets-list'),

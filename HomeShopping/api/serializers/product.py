@@ -193,4 +193,18 @@ class ProductSerializer(BaseProductSerializer):
 
 class AddProductSerializer(serializers.Serializer):
     quantity = serializers.IntegerField(required=True)
-    product = serializers.PrimaryKeyRelatedField(queryset=Product.objects, required=True)
+    #product = serializers.PrimaryKeyRelatedField(queryset=Product.objects, required=True)
+    product = serializers.HyperlinkedRelatedField(
+        view_name="product-detail",
+        queryset=Product.objects,
+        required=True,
+    )
+    stockrecord = serializers.HyperlinkedRelatedField(
+        view_name='product-stockrecord-detail',
+        queryset=StockRecord.objects,
+    )
+
+    def validate(self, attrs):
+        if attrs['product'].id != attrs['stockrecord'].product_id:
+            raise serializers.ValidationError('Incorrect stockrecord')
+        return attrs

@@ -55,22 +55,21 @@ class Basket(models.Model):
         self.date_submitted = now()
         self.save()
 
-    def add_product(self, product, quantity=1):
+    def add_product(self, product, stockrecord, quantity=1):
         if not self.id:
             self.save()
         defaults = {
             'quantity': quantity,
         }
-        line, created = self.lines.get_or_create(product=product, defaults=defaults)
+        line, created = self.lines.get_or_create(product=product, stockrecord=stockrecord, defaults=defaults)
         if not created:
             line.quantity = max(0, line.quantity + quantity)
             line.save()
         return line, created
 
-
     def merge_line(self, line, add_quantities):
         try:
-            existing_line = self.lines.get(product=line.product)
+            existing_line = self.lines.get(product=line.product, stockrecord=line.stockrecord)
         except ObjectDoesNotExist:
             line.basket = self
             line.save()
@@ -90,9 +89,9 @@ class Basket(models.Model):
 
         basket.save()
 
-    def current_quantity(self, product):
+    def current_quantity(self, product, stockrecord):
         try:
-            return self.lines.get(product_id=product).quantity
+            return self.lines.get(product_id=product, stockrecord=stockrecord).quantity
         except ObjectDoesNotExist:
             return 0
 
@@ -111,7 +110,8 @@ class Basket(models.Model):
 
     @property
     def total_price(self):
-        return self._total_price('line_price')
+        if self.pk:
+            return self._total_price('line_price')
 
     @property
     def is_submitted(self):
@@ -126,7 +126,16 @@ class Basket(models.Model):
 
 
 class BasketLine(models.Model):
-    basket = models.ForeignKey('Basket', on_delete=models.CASCADE, related_name='lines')
+    stockrecord = models.ForeignKey(
+        'product.StockRecord',
+        related_name='basket_lines',
+        on_delete=models.CASCADE,
+    )
+    basket = models.ForeignKey(
+        'Basket',
+        on_delete=models.CASCADE,
+        related_name='lines',
+    )
     quantity = models.PositiveIntegerField(default=1)
     product = models.ForeignKey('product.Product', on_delete=models.CASCADE, related_name='basket_lines')
 
@@ -139,8 +148,12 @@ class BasketLine(models.Model):
 
     @property
     def line_price(self):
-        return self.quantity * self.product.price
+        return self.quantity * self.stockrecord.price
+
+    # @property
+    # def line_price(self):
+    #     return self.quantity * self.product.price
 
     @property
     def available_quantity(self):
-        return self.product.allowed_quantity
+        return self.stockrecord.num_in_stock

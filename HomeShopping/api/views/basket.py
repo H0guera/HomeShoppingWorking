@@ -25,32 +25,50 @@ class AddProductView(APIView):
     serializer_class = AddProductSerializer
     basket_serializer_class = BasketSerializer
 
-    def validate(self, basket, product, quantity):
+    def validate(self, basket, product, quantity, stockrecord):
+        if basket.pk:
+            current_quantity = basket.current_quantity(product, stockrecord)
+            desired_quantity = current_quantity + quantity
+        else:
+            desired_quantity = quantity
 
-        current_quantity = basket.current_quantity(product)
-        desired_quantity = current_quantity + quantity
-
-        if desired_quantity > product.allowed_quantity:
-            if product.allowed_quantity == 0:
-                message = "This product is not available to buy"
+        #if desired_quantity > product.allowed_quantity:
+        if desired_quantity > stockrecord.num_in_stock:
+            if stockrecord.num_in_stock < 1:
+                message = 'This product is not available to buy now'
                 return False, message
-            message = f'This quantity is not allowed.Allowed quantity is {product.allowed_quantity}'
+            message = f'This quantity is not allowed.'
             return False, message
         return True, None
+
+    # def validate(self, basket, product, quantity, stockrecord):
+    #
+    #     current_quantity = basket.current_quantity(product)
+    #     desired_quantity = current_quantity + quantity
+    #
+    #     #if desired_quantity > product.allowed_quantity:
+    #     if desired_quantity > stockrecord.num_in_stock:
+    #         if product.allowed_quantity == 0:
+    #             message = "This product is not available to buy"
+    #             return False, message
+    #         message = f'This quantity is not allowed.Allowed quantity is {product.allowed_quantity}'
+    #         return False, message
+    #     return True, None
 
     def post(self, request, *args, **kwargs):
         p_ser = self.add_product_serializer_class(data=request.data, context={"request": request})
         if p_ser.is_valid():
             product = p_ser.validated_data['product']
             quantity = p_ser.validated_data['quantity']
-            basket_valid, message = self.validate(request.basket, product, quantity)
+            stockrecord = p_ser.validated_data['stockrecord']
+            basket_valid, message = self.validate(request.basket, product, quantity, stockrecord)
             if not basket_valid:
                 return Response(
                     {"reason": message},
                     status=status.HTTP_406_NOT_ACCEPTABLE,
                 )
 
-            request.basket.add_product(product, quantity=quantity)
+            request.basket.add_product(product, stockrecord, quantity=quantity)
             ser = self.basket_serializer_class(request.basket, context={"request": request})
             return Response(ser.data)
         return Response({"reason": p_ser.errors}, status=status.HTTP_406_NOT_ACCEPTABLE)

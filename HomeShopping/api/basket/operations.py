@@ -45,7 +45,7 @@ def get_user_basket(user):
     "get basket for a user."
 
     try:
-        basket, __ = Basket.objects.get_or_create(owner=user)
+        basket, __ = Basket.open.get_or_create(owner=user)
     except Basket.MultipleObjectsReturned:
         # Not sure quite how we end up here with multiple baskets.
         # We merge them and create a fresh one
