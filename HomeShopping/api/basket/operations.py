@@ -102,5 +102,4 @@ def parse_basket_from_hyperlink(DATA, format):  # pylint: disable=redefined-buil
     except ValidationError as e:
         raise exceptions.NotAcceptable(e.messages)
     else:
-        print(data_basket)
         return data_basket

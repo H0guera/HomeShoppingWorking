@@ -275,3 +275,35 @@ class TestBasket(APITest):
         self.response = self.get('api-basket')
         self.response.assertStatusEqual(200)
         self.response.assertValueEqual('total_price', '0.00')
+
+
+    def test_add_a_product_with_different_stockrecords(self):
+        self.login('nobody', 'nobody')
+        self.response = self.post(
+            'add-product',
+            product='http://testserver/api/products/1/',
+            quantity=2,
+            stockrecord='http://testserver/api/products/1/stockrecords/1/',
+        )
+        self.response.assertStatusEqual(200)
+        self.response = self.post(
+            'add-product',
+            product='http://testserver/api/products/1/',
+            quantity=2,
+            stockrecord='http://testserver/api/products/1/stockrecords/2/',
+        )
+        self.response.assertStatusEqual(200)
+        self.response = self.get('api-basket')
+        self.response.assertStatusEqual(200)
+
+        lines_url = self.response['lines']
+        self.response = self.get(lines_url)
+        self.response.assertStatusEqual(200)
+
+        first_line = self.response[0]
+        second_line = self.response[1]
+        self.assertEqual(first_line['quantity'], 2)
+        self.assertEqual(first_line['price'], '20.00')
+        self.assertEqual(second_line['quantity'], 2)
+        self.assertEqual(second_line['price'], '10.00')
+

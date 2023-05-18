@@ -62,10 +62,13 @@ class OrderPlacementMixin:
         return order
 
     def create_line_models(self, order, basket_line):
-        line_data = {'order': order,
-                     'product': basket_line.product,
-                     'quantity': basket_line.quantity,
-                     'stockrecord': basket_line.product.stockrecords.get(product=basket_line.product)}
+        line_data = {
+            'order': order,
+            'product': basket_line.product,
+            'quantity': basket_line.quantity,
+            'stockrecord': basket_line.stockrecord
+            #'stockrecord': basket_line.product.stockrecords.get(product=basket_line.product)
+        }
         order_line = OrderLine(**line_data)
         order_line.save()
         self.create_line_attrs(order_line, basket_line)
@@ -76,6 +79,7 @@ class OrderPlacementMixin:
                                               value=attr.productattributevalue_set.get(id=attr.id))
 
     def update_stock_records(self, basket_line):
-        stockrecord = basket_line.product.stockrecords.get(product=basket_line.product)
+        #stockrecord = basket_line.product.stockrecords.get(product=basket_line.product)
+        stockrecord = basket_line.stockrecord
         stockrecord.num_in_stock -= basket_line.quantity
         stockrecord.save()

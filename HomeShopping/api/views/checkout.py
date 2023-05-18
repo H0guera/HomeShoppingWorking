@@ -32,7 +32,7 @@ class OrderLineDetail(generics.RetrieveAPIView):
     serializer_class = OrderLineSerializer
 
 
-class OrderLineAttribute(generics.RetrieveAPIView):
+class OrderLineAttributeDetail(generics.RetrieveAPIView):
     queryset = OrderLineAttribute.objects.all()
     serializer_class = OrderLineAttributeSerializer
 

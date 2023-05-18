@@ -60,6 +60,8 @@ class AdminStockRecordsSerializer(serializers.ModelSerializer):
     def validate(self, attrs):
         if not attrs.get('partner_sku', None):
             raise serializers.ValidationError('A partner sku field is required')
+        elif attrs.get('partner_sku') == '':
+            raise serializers.ValidationError('A partner sku field cant be blank')
         return attrs
 
 

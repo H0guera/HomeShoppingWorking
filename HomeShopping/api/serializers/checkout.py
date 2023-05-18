@@ -84,7 +84,7 @@ class CheckoutSerializer(serializers.Serializer, OrderPlacementMixin):
         if basket.num_items() <= 0:
             message = "Cannot checkout with empty basket"
             raise serializers.ValidationError(message)
-        total = basket.total_excl
+        total = basket.total_price
 
         attrs["order_total"] = total
         return attrs
