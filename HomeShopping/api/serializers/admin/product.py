@@ -69,6 +69,7 @@ class AdminProductSerializer(BaseProductSerializer, UpdateRelationMixin):
     url = serializers.HyperlinkedIdentityField(view_name='admin-product-detail')
     stockrecords = AdminStockRecordsSerializer(required=False, many=True)
     category = serializers.SlugRelatedField(slug_field='slug', queryset=ProductCategory.objects, required=False)
+
     class Meta(BaseProductSerializer.Meta):
         fields = '__all__'
 

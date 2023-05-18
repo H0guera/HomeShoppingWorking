@@ -6,7 +6,7 @@ from django.http import SimpleCookie
 from django.test import TestCase
 from django.urls import NoReverseMatch, reverse
 
-from product.models import ProductClass, Product, ProductCategory, StockRecord
+from product.models import ProductClass, Product, ProductCategory, StockRecord, ProductAttribute
 
 
 class APITest(TestCase):
@@ -87,6 +87,19 @@ class APITest(TestCase):
     def setUpClass(cls):
         super().setUpClass()
         cls.product_class = ProductClass.objects.create(name='t-shirts', slug='t-shirts')
+        cls.attribute = ProductAttribute.objects.create(
+            name='size',
+            code='size',
+            type='integer',
+            product=cls.product_class,
+        )
+        cls.attribute = ProductAttribute.objects.create(
+            name='color',
+            code='color',
+            type='text',
+            product=cls.product_class,
+            required=True,
+        )
         cls.category = ProductCategory.objects.create(title='Male')
         cls.standalone_product = Product.objects.create(
             title='standalone_product',

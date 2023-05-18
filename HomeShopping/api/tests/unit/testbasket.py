@@ -276,7 +276,6 @@ class TestBasket(APITest):
         self.response.assertStatusEqual(200)
         self.response.assertValueEqual('total_price', '0.00')
 
-
     def test_add_a_product_with_different_stockrecords(self):
         self.login('nobody', 'nobody')
         self.response = self.post(
