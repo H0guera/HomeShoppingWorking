@@ -108,10 +108,18 @@ class APITest(TestCase):
             parent=cls.parent_product,
         )
         cls.stockrecord = StockRecord.objects.create(
+            partner_sku='partner1',
             product=cls.standalone_product,
             num_in_stock=10,
             price=10,
             owner=User.objects.create(id=4, username='partner', password='partner', email='partner@partn.er'),
+        )
+        cls.stockrecord = StockRecord.objects.create(
+            partner_sku='partner2',
+            product=cls.standalone_product,
+            num_in_stock=5,
+            price=5,
+            owner=User.objects.create(id=5, username='partner2', password='partner2', email='partner2@partn.er'),
         )
 
     @classmethod

@@ -7,6 +7,16 @@ from rest_framework.permissions import (
 from api.basket.operations import request_allows_access_to
 
 
+class IsOwner(IsAuthenticated):
+    """
+    Permission that checks if this object has a foreign key pointing to the
+    authenticated user of this request
+    """
+
+    def has_object_permission(self, request, view, obj):
+        return obj.user == request.user
+
+
 class APIAdminPermission(DjangoModelPermissions):
     """
     The permission for all the admin api views. You only get admin api access when:
