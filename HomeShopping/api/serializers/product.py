@@ -123,8 +123,8 @@ class ProductAttributeValueSerializer(serializers.ModelSerializer):
 
 class ProductStockRecordSerializer(serializers.ModelSerializer):
     url = DrillDownHyperlinkedIdentityField(
-        view_name="product-stockrecord-detail",
-        extra_url_kwargs={"product_pk": "product_id"},
+        view_name='product-stockrecord-detail',
+        extra_url_kwargs={'product_pk': 'product_id'},
     )
 
     class Meta:
@@ -150,9 +150,9 @@ class BaseProductSerializer(serializers.ModelSerializer):
 
 class ChildProductSerializer(BaseProductSerializer):
     "Serializer for child products"
-    url = serializers.HyperlinkedIdentityField(view_name="product-detail")
+    url = serializers.HyperlinkedIdentityField(view_name='product-detail')
     parent = serializers.HyperlinkedRelatedField(
-        view_name="product-detail",
+        view_name='product-detail',
         queryset=Product.objects.filter(structure=Product.PARENT),
     )
 
@@ -162,7 +162,7 @@ class ChildProductSerializer(BaseProductSerializer):
 
 
 class ProductSerializer(BaseProductSerializer):
-    url = serializers.HyperlinkedIdentityField(view_name="product-detail")
+    url = serializers.HyperlinkedIdentityField(view_name='product-detail')
     children = ChildProductSerializer(many=True, required=False)
     stockrecords = ProductStockRecordSerializer(many=True, required=False)
 
@@ -173,7 +173,7 @@ class ProductSerializer(BaseProductSerializer):
 class AddProductSerializer(serializers.Serializer):
     quantity = serializers.IntegerField(required=True)
     product = serializers.HyperlinkedRelatedField(
-        view_name="product-detail",
+        view_name='product-detail',
         queryset=Product.objects,
         required=True,
     )
@@ -184,5 +184,5 @@ class AddProductSerializer(serializers.Serializer):
 
     def validate(self, attrs):
         if attrs['product'].id != attrs['stockrecord'].product_id:
-            raise serializers.ValidationError('Incorrect stockrecord')
+            raise serializers.ValidationError("Incorrect stockrecord")
         return attrs

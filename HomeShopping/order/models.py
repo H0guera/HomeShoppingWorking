@@ -15,7 +15,7 @@ class ShippingAddress(models.Model):
     )
     notes = models.TextField(
         blank=True,
-        verbose_name='Instructions',
+        verbose_name="Instructions",
         help_text="Tell us anything we should know when delivering your order.",
     )
 

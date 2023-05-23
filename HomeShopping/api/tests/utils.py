@@ -54,7 +54,7 @@ class APITest(TestCase):
         method = getattr(self.client, method.lower())
         kwargs = {"content_type": "application/json"}
         if session_id is not None:
-            auth_type = "AUTH" if authenticated else "ANON"
+            auth_type = 'AUTH' if authenticated else 'ANON'
             kwargs["HTTP_SESSION_ID"] = "SID:%s:testserver:%s" % (auth_type, session_id)
 
         response = None
@@ -89,8 +89,8 @@ class APITest(TestCase):
         return self.api_call(url, method, session_id, authenticated)
 
     def tearDown(self):
-        User.objects.get(username="admin").delete()
-        User.objects.get(username="nobody").delete()
+        User.objects.get(username='admin').delete()
+        User.objects.get(username='nobody').delete()
 
     @classmethod
     def setUpClass(cls):
@@ -198,10 +198,10 @@ class ParsedResponse(object):
         self.t.assertEqual(self[value_name], value, message)
 
     def assertObjectIdEqual(self, value_name, value, message=None):
-        pattern = r".*?%s.*?/(?P<object_id>\d+)/?" % reverse("api-root")
+        pattern = r".*?%s.*?/(?P<object_id>\d+)/?" % reverse('api-root')
         match_object = match(pattern, self[value_name])
         if match_object:
-            object_id = int(match_object.groupdict()["object_id"])
+            object_id = int(match_object.groupdict()['object_id'])
         else:
             object_id = None
         self.t.assertEqual(object_id, value, message)

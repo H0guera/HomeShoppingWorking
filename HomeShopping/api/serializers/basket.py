@@ -9,7 +9,11 @@ from basket.models import Basket, BasketLine
 
 
 class BasketSerializer(serializers.HyperlinkedModelSerializer):
-    lines = serializers.HyperlinkedIdentityField(view_name="basket-lines-list", many=False, read_only=True)
+    lines = serializers.HyperlinkedIdentityField(
+        view_name='basket-lines-list',
+        many=False,
+        read_only=True,
+    )
     total_price = serializers.DecimalField(
         decimal_places=2,
         max_digits=12,
@@ -36,8 +40,8 @@ class BasketSerializer(serializers.HyperlinkedModelSerializer):
 
 class BasketLineSerializer(serializers.HyperlinkedModelSerializer):
     url = DrillDownHyperlinkedIdentityField(
-        view_name="basket-line-detail",
-        extra_url_kwargs={"basket_pk": "basket.id"},
+        view_name='basket-line-detail',
+        extra_url_kwargs={'basket_pk': 'basket.id'},
     )
     product = ProductSerializer(read_only=True)
     price = serializers.DecimalField(
@@ -50,7 +54,7 @@ class BasketLineSerializer(serializers.HyperlinkedModelSerializer):
 
     def validate(self, attrs):
         line = self.instance
-        if attrs["quantity"] > line.available_quantity:
+        if attrs['quantity'] > line.available_quantity:
             message = "Cannot buy this quantity."
             raise serializers.ValidationError(message)
         return attrs

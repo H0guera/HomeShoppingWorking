@@ -19,45 +19,45 @@ class ProductTest(APITest):
             self.assertIn(field, product)
 
     def test_product_list_filter(self):
-        standalone_products_url = "%s?structure=standalone" % reverse("product-list")
+        standalone_products_url = '%s?structure=standalone' % reverse('product-list')
         self.response = self.get(standalone_products_url)
         self.response.assertStatusEqual(200)
         self.assertEqual(len(self.response.body), 1)
 
-        parent_products_url = "%s?structure=parent" % reverse("product-list")
+        parent_products_url = '%s?structure=parent' % reverse('product-list')
         self.response = self.get(parent_products_url)
         self.response.assertStatusEqual(200)
         self.assertEqual(len(self.response.body), 1)
 
-        child_products_url = "%s?structure=child" % reverse("product-list")
+        child_products_url = '%s?structure=child' % reverse('product-list')
         self.response = self.get(child_products_url)
         self.response.assertStatusEqual(200)
         self.assertEqual(len(self.response.body), 1)
 
-        koe_products_url = "%s?structure=koe" % reverse("product-list")
+        koe_products_url = '%s?structure=koe' % reverse("product-list")
         self.response = self.get(koe_products_url)
         self.response.assertStatusEqual(200)
         self.assertEqual(len(self.response.body), 0)
 
     def test_product_detail(self):
         "Check product details"
-        self.response = self.get(reverse("product-detail", args=(1,)))
+        self.response = self.get(reverse('product-detail', args=(1,)))
         self.response.assertStatusEqual(200)
         default_fields = (
-            "url",
-            "id",
-            "title",
-            "structure",
-            "description",
-            "attributes",
-            "category",
-            "product_class",
-            "children",
+            'url',
+            'id',
+            'title',
+            'structure',
+            'description',
+            'attributes',
+            'category',
+            'product_class',
+            'children',
         )
         for field in default_fields:
             self.assertIn(field, self.response.body)
 
-        self.response.assertValueEqual("title", "standalone_product")
+        self.response.assertValueEqual('title', 'standalone_product')
 
 
 class _ProductSerializerTest(APITest):
@@ -85,8 +85,8 @@ class AdminStockRecordSerializerTest(_ProductSerializerTest):
         )
         self.assertTrue(ser.is_valid(), "There where errors %s" % ser.errors)
         obj = ser.save()
-        self.assertEqual(obj.product.get_title(), "standalone_product")
-        self.assertEqual(obj.price, decimal.Decimal("20.00"))
+        self.assertEqual(obj.product.get_title(), 'standalone_product')
+        self.assertEqual(obj.price, decimal.Decimal('20.00'))
         self.assertEqual(obj.owner.username, 'admin')
         # update
         ser = AdminStockRecordsSerializer(
@@ -100,8 +100,8 @@ class AdminStockRecordSerializerTest(_ProductSerializerTest):
         )
         self.assertTrue(ser.is_valid(), "There where errors %s" % ser.errors)
         obj = ser.save()
-        self.assertEqual(obj.product.get_title(), "standalone_product")
-        self.assertEqual(obj.price, decimal.Decimal("15.00"))
+        self.assertEqual(obj.product.get_title(), 'standalone_product')
+        self.assertEqual(obj.price, decimal.Decimal('15.00'))
         self.assertEqual(obj.num_in_stock, 15)
         self.assertEqual(obj.owner.username, 'admin')
 
@@ -129,9 +129,9 @@ class AdminProductSerializerTest(_ProductSerializerTest):
         self.assertTrue(ser.is_valid(), "Something wrong %s" % ser.errors)
         obj = ser.save()
         self.assertEqual(obj.pk, 4, "Should be new object, with a high pk")
-        self.assertEqual(obj.product_class.slug, "t-shirts")
+        self.assertEqual(obj.product_class.slug, 't-shirts')
         self.assertEqual(obj.stockrecords.count(), 1)
-        self.assertEqual(obj.title, "test")
+        self.assertEqual(obj.title, 'test')
 
     def test_modify_product(self):
         "We should a able to change product fields."
@@ -147,12 +147,12 @@ class AdminProductSerializerTest(_ProductSerializerTest):
         self.assertTrue(ser.is_valid(), "Something wrong %s" % ser.errors)
         obj = ser.save()
         self.assertEqual(obj.pk, 1, "product should be the same as passed as instance")
-        self.assertEqual(obj.description, "Henk")
+        self.assertEqual(obj.description, 'Henk')
 
     def test_add_attribute_to_product(self):
         product = Product.objects.get(pk=1)
 
-        self.assertEqual(product.product_class.slug, "t-shirts")
+        self.assertEqual(product.product_class.slug, 't-shirts')
         x = product.product_class.attributes.get(code='size')
         self.assertEqual(x.type, 'text')
 
@@ -169,7 +169,7 @@ class AdminProductSerializerTest(_ProductSerializerTest):
         self.assertTrue(ser.is_valid(), "Something wrong %s" % ser.errors)
         obj = ser.save()
         self.assertEqual(obj.pk, 1, "product should be the same as passed as instance")
-        self.assertEqual(obj.product_class.slug, "t-shirts")
+        self.assertEqual(obj.product_class.slug, 't-shirts')
         return obj
 
     def test_modify_product_error(self):
@@ -187,7 +187,7 @@ class AdminProductSerializerTest(_ProductSerializerTest):
         )
         self.assertFalse(ser.is_valid(), "Should fail because of missing code")
         self.assertDictEqual(
-            ser.errors, {"attributes": [{"code": "This field is required."}]},
+            ser.errors, {'attributes': [{"code": "This field is required."}]},
         )
 
     def test_switch_product_class(self):
@@ -207,7 +207,7 @@ class AdminProductSerializerTest(_ProductSerializerTest):
         self.assertTrue(ser.is_valid(), "Something wrong %s" % ser.errors)
         obj = ser.save()
         self.assertEqual(obj.pk, 1)
-        self.assertEqual(obj.product_class.slug, "sneaker")
+        self.assertEqual(obj.product_class.slug, 'sneaker')
         self.assertEqual(product.attribute_values.count(), 1)
         self.assertEqual(product.attribute_values.first().value, 40)
 
@@ -270,7 +270,7 @@ class AdminProductSerializerTest(_ProductSerializerTest):
 
         self.assertTrue(ser.is_valid(), "Something wrong %s" % ser.errors)
         obj = ser.save()
-        self.assertEqual(obj.category.title, "Male")
+        self.assertEqual(obj.category.title, 'Male')
 
 
 class TestProductAdmin(APITest):
@@ -300,7 +300,7 @@ class TestProductAdmin(APITest):
 
     def test_post_product(self):
         self.assertEqual(Product.objects.count(), 3)
-        self.login("admin", "admin")
+        self.login('admin', 'admin')
 
         data = self.default_data.copy()
         self.response = self.post('admin-product-list', **data)
@@ -308,17 +308,17 @@ class TestProductAdmin(APITest):
         self.assertEqual(Product.objects.count(), 4)
 
         data = self.default_data.copy()
-        data["structure"] = "parent"
-        data["title"] = "testparent"
-        data["article"] = "testparent"
-        data.pop("stockrecords")
-        self.response = self.post("admin-product-list", **data)
+        data['structure'] = 'parent'
+        data['title'] = 'testparent'
+        data['article'] = 'testparent'
+        data.pop('stockrecords')
+        self.response = self.post('admin-product-list', **data)
         self.response.assertStatusEqual(201)
         self.assertEqual(Product.objects.count(), 5)
 
     def test_patch_product(self):
-        self.login("admin", "admin")
-        url = reverse("admin-product-detail", args=(1,))
+        self.login('admin', 'admin')
+        url = reverse('admin-product-detail', args=(1,))
         self.response = self.patch(
             url,
             **{
@@ -344,8 +344,8 @@ class TestProductAdmin(APITest):
         self.response.assertStatusEqual(200)
 
     def test_patch_child(self):
-        self.login("admin", "admin")
-        url = reverse("admin-product-detail", args=(3,))
+        self.login('admin', 'admin')
+        url = reverse('admin-product-detail', args=(3,))
         self.response = self.patch(
             url,
             **{
@@ -371,8 +371,8 @@ class TestProductAdmin(APITest):
         self.response.assertStatusEqual(200)
 
     def test_child_error(self):
-        self.login("admin", "admin")
-        url = reverse("admin-product-detail", args=(3,))
+        self.login('admin', 'admin')
+        url = reverse('admin-product-detail', args=(3,))
         self.response = self.patch(
             url,
             **{
@@ -385,22 +385,22 @@ class TestProductAdmin(APITest):
             },
         )
         self.response.assertStatusEqual(400)
-        error = str(self.response["attributes"][0]["value"][0])
+        error = str(self.response['attributes'][0]['value'][0])
         self.assertEqual(
             error,
-            'Error assigning `1` to size, Must be str.',
+            "Error assigning `1` to size, Must be str.",
         )
 
 
 class TestProductClass(APITest):
     def test_post_product_class(self):
-        self.login("admin", "admin")
+        self.login('admin', 'admin')
         self.assertEqual(ProductClass.objects.count(), 2)
         data = {
             "name": "testpc",
             "slug": "testpc",
         }
-        self.response = self.post("admin-product-class-list", **data)
+        self.response = self.post('admin-product-class-list', **data)
         self.response.assertStatusEqual(201, self.response.data)
         self.assertEqual(ProductClass.objects.count(), 3)
 

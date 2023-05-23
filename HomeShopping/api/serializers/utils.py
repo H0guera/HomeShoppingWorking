@@ -39,7 +39,7 @@ class UpdateRelationMixin:
 
         if self.partial:
             manager.add(*updated_values)
-        elif hasattr(manager, "field") and not manager.field.null:
+        elif hasattr(manager, 'field') and not manager.field.null:
             # add the updated_attribute_values to the instance
             manager.add(*updated_values)
             # remove all the obsolete attribute values, this could be caused by

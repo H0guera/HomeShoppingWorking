@@ -68,9 +68,9 @@ class TestBasket(APITest):
         # let's try to add product with wrong stockrecord
         self.response = self.post(
             'add-product',
-            product="http://testserver/api/products/3/",
+            product='http://testserver/api/products/3/',
             quantity=1,
-            stockrecord="http://testserver/api/products/1/stockrecords/1/",
+            stockrecord='http://testserver/api/products/1/stockrecords/1/',
         )
         self.response.assertStatusEqual(406)
         self.response.assertValueEqual('reason',  {'non_field_errors': ["Incorrect stockrecord"]})
@@ -206,7 +206,7 @@ class TestBasket(APITest):
         # see if it's updated
         self.response = self.get(basket_line_url)
         self.response.assertStatusEqual(200)
-        self.response.assertValueEqual("quantity", 2)
+        self.response.assertValueEqual('quantity', 2)
 
     def test_merge_baskets_updates_users_basket_lines(self):
 

@@ -8,13 +8,13 @@ from api.serializers.exceptions import FieldError
 from product.models import ProductAttribute
 
 
-attribute_details = operator.itemgetter("code", "value")
+attribute_details = operator.itemgetter('code', 'value')
 
 
 class DrillDownHyperlinkedMixin:
     def __init__(self, *args, **kwargs):
         try:
-            self.extra_url_kwargs = kwargs.pop("extra_url_kwargs")
+            self.extra_url_kwargs = kwargs.pop('extra_url_kwargs')
         except KeyError:
             msg = "DrillDownHyperlink Fields require an 'extra_url_kwargs' argument"
             raise ValueError(msg)
@@ -33,7 +33,7 @@ class DrillDownHyperlinkedMixin:
         May raise a `NoReverseMatch` if the `view_name` and `lookup_field`
         attributes are not configured to correctly match the URL conf.
         """
-        if hasattr(obj, "pk") and obj.pk in (None, ""):
+        if hasattr(obj, 'pk') and obj.pk in (None, ''):
             return None
 
         lookup_value = getattr(obj, self.lookup_field)
@@ -62,18 +62,18 @@ class DrillDownHyperlinkedRelatedField(
 class AttributeValueField(serializers.Field):
     def __init__(self, **kwargs):
         # this field always needs the full object
-        kwargs["source"] = "*"
-        kwargs["error_messages"] = {
-            "no_such_option": "{code}: Option {value} does not exist.",
-            "invalid": "Wrong type, {error}.",
-            "attribute_validation_error":
+        kwargs['source'] = '*'
+        kwargs['error_messages'] = {
+            'no_such_option': "{code}: Option {value} does not exist.",
+            'invalid': "Wrong type, {error}.",
+            'attribute_validation_error':
                 "Error assigning `{value}` to {code}, {error}.",
-            "attribute_required": "Attribute {code} is required.",
-            "attribute_missing":
+            'attribute_required': "Attribute {code} is required.",
+            'attribute_missing':
                 "No attribute exist with code={code}, "
                 "please define it in the product_class first.",
 
-            "child_without_parent":
+            'child_without_parent':
                 "Can not find attribute if product_class is empty and "
                 "parent is empty as well, child without parent?",
         }
@@ -87,7 +87,7 @@ class AttributeValueField(serializers.Field):
         return dictionary
 
     def to_internal_value(self, data):
-        assert "product" in data or "product_class" in data or "parent" in data
+        assert 'product' in data or 'product_class' in data or 'parent' in data
 
         try:
             code, value = attribute_details(data)
@@ -104,31 +104,31 @@ class AttributeValueField(serializers.Field):
                 )
 
             if attribute.required and value is None:
-                self.fail("attribute_required", code=code)
+                self.fail('attribute_required', code=code)
 
             try:
                 attribute.validate_value(internal_value)
             except TypeError as e:
                 self.fail(
-                    "attribute_validation_error",
+                    'attribute_validation_error',
                     code=code,
                     value=internal_value,
                     error=e,
                 )
             except ValidationError as e:
                 self.fail(
-                    "attribute_validation_error",
+                    'attribute_validation_error',
                     code=code,
                     value=internal_value,
                     error=",".join(e.messages),
                 )
             return {'value': internal_value, 'attribute': attribute}
         except ProductAttribute.DoesNotExist:
-            self.fail("attribute_missing", **data)
+            self.fail('attribute_missing', **data)
         except KeyError as e:
             (field_name,) = e.args
             raise FieldError(
-                detail={field_name: self.error_messages["required"]}, code="required",
+                detail={field_name: self.error_messages['required']}, code='required',
             )
 
     def to_representation(self, value):

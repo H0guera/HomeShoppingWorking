@@ -92,12 +92,12 @@ def store_basket_in_session(basket, session):
 def parse_basket_from_hyperlink(DATA, format):  # pylint: disable=redefined-builtin
     "Parse basket from relation hyperlink"
     basket_parser = HyperlinkedRelatedField(
-        view_name="basket-detail",
+        view_name='basket-detail',
         queryset=Basket.objects,
         format=format,
     )
     try:
-        basket_uri = DATA.get("basket")
+        basket_uri = DATA.get('basket')
         data_basket = basket_parser.to_internal_value(basket_uri)
     except ValidationError as e:
         raise exceptions.NotAcceptable(e.messages)
