@@ -3,7 +3,11 @@ import operator
 from django.core.exceptions import ValidationError
 from rest_framework import relations, serializers
 
+from api.serializers.exceptions import FieldError
 from product.models import ProductAttribute
+
+
+attribute_details = operator.itemgetter("code", "value")
 
 
 class DrillDownHyperlinkedMixin:
@@ -84,22 +88,22 @@ class AttributeValueField(serializers.Field):
 
     def to_internal_value(self, data):
         assert "product" in data or "product_class" in data or "parent" in data
-        #assert "product_class" in data
-        #assert "product" in data
-        #assert "parent" in data
 
         try:
-            code, value = data['code'], data['value']
+            code, value = attribute_details(data)
+            # value = data.get('value', None)
+            # code = data.get('code', None)
             internal_value = value
 
-            if 'product' in data:
+            if 'product_class' in data and data['product_class'] is not None and data['product_class'] != '':
+                attribute = ProductAttribute.objects.get(code=code, product_class__slug=data.get('product_class'))
+            elif 'parent' in data and data['parent'] is not None:
+                attribute = ProductAttribute.objects.get(code=code, product_class__product__id=data.get('parent'))
+            elif 'product' in data:
                 attribute = ProductAttribute.objects.get(
                     code=code,
-                    product_class=data.get('product').get_product_class())
-            elif 'product_class' in data and data['product_class'] is not None and data['product_class'] != '':
-                attribute = ProductAttribute.objects.get(code=code, product_class__slug=data.get('product_class'))
-            elif 'parent' in data:
-                attribute = ProductAttribute.objects.get(code=code, product_class__product__id=data.get('parent'))
+                    product_class=data.get('product').get_product_class()
+                )
 
             if attribute.required and value is None:
                 self.fail("attribute_required", code=code)
@@ -122,15 +126,20 @@ class AttributeValueField(serializers.Field):
                 )
             return {'value': internal_value, 'attribute': attribute}
         except ProductAttribute.DoesNotExist:
-            if (
-                    "product_class" in data
-                    and "parent" in data
-                    and data["product_class"] is None
-                    and data["parent"] is None
-            ):
-                self.fail("child_without_parent")
-            else:
+            # if (
+            #         "product_class" in data
+            #         and "parent" in data
+            #         and data["product_class"] is None
+            #         and data["parent"] is None
+            # ):
+            #     self.fail("child_without_parent")
+            # else:
                 self.fail("attribute_missing", **data)
+        except KeyError as e:
+            (field_name,) = e.args
+            raise FieldError(
+                detail={field_name: self.error_messages["required"]}, code="required"
+            )
 
     def to_representation(self, value):
         return value.value

@@ -6,18 +6,30 @@ from django.http import SimpleCookie
 from django.test import TestCase
 from django.urls import NoReverseMatch, reverse
 
-from product.models import ProductClass, Product, ProductCategory, StockRecord
+from product.models import ProductClass, Product, ProductCategory, StockRecord, ProductAttribute
 
 
 class APITest(TestCase):
 
     def setUp(self) -> None:
-        user = User.objects.create_user(id=1, username='admin', email='admin@admin.adm', password='admin')
-        user.is_stuff = True
-        user.is_superuser = True
-        user.save()
+        User.objects.create_user(
+            id=1, username='admin',
+            email='admin@admin.adm',
+            password='admin',
+            is_staff=True,
+            is_superuser=True,
+        )
+        # user.is_stuff = True
+        # user.is_superuser = True
+        # user.save()
 
-        user = User.objects.create_user(id=2, username='nobody', email='nobody@nobody.nbd', password='nobody')
+        user = User.objects.create_user(
+            id=2,
+            username='nobody',
+            email='nobody@nobody.nbd',
+            password='nobody',
+
+        )
         user.is_stuff = False
         user.is_superuser = False
         user.save()
@@ -87,7 +99,27 @@ class APITest(TestCase):
     def setUpClass(cls):
         super().setUpClass()
         cls.product_class = ProductClass.objects.create(name='t-shirts', slug='t-shirts')
-        cls.category = ProductCategory.objects.create(title='Male')
+        cls.product_class2 = ProductClass.objects.create(name='sneaker', slug='sneaker')
+        cls.attribute = ProductAttribute.objects.create(
+            name='size',
+            code='size',
+            type='text',
+            product_class=cls.product_class,
+        )
+        cls.attribute = ProductAttribute.objects.create(
+            name='color',
+            code='color',
+            type='text',
+            product_class=cls.product_class,
+            required=True,
+        )
+        cls.attribute = ProductAttribute.objects.create(
+            name='size',
+            code='size',
+            type='integer',
+            product_class=cls.product_class2,
+        )
+        cls.category = ProductCategory.objects.create(title='Male', slug='male')
         cls.standalone_product = Product.objects.create(
             title='standalone_product',
             article='standalone_product',
@@ -96,8 +128,8 @@ class APITest(TestCase):
         )
         cls.parent_product = Product.objects.create(
             structure='parent',
-            title='testproduct1',
-            article='testproduct1',
+            title='parent_product',
+            article='parent_product',
             category=cls.category,
             product_class=cls.product_class,
         )
