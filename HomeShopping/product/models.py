@@ -26,18 +26,18 @@ class Product(models.Model):
         null=True,
         on_delete=models.SET_NULL)
     attributes = models.ManyToManyField(
-        'ProductAttribute',
+        "ProductAttribute",
         through='ProductAttributeValue',
     )
     parent = models.ForeignKey(
-        'self',
+        "self",
         blank=True,
         null=True,
         on_delete=models.CASCADE,
         related_name='children',
     )
     product_class = models.ForeignKey(
-        'ProductClass',
+        "ProductClass",
         null=True,
         blank=True,
         on_delete=models.PROTECT,
@@ -267,13 +267,13 @@ class StockRecord(models.Model):
     partner_sku = models.CharField(max_length=55, unique=True)
     price = models.FloatField(validators=(MinValueValidator(limit_value=0.01),))
     num_in_stock = models.PositiveIntegerField(
-        'Number in stock', blank=True, null=True)
+        "Number in stock", blank=True, null=True)
 
     low_stock_threshold = models.PositiveIntegerField(
-        'Low Stock Threshold', blank=True, null=True)
+        "Low Stock Threshold", blank=True, null=True)
 
-    date_created = models.DateTimeField('Date created', auto_now_add=True)
-    date_updated = models.DateTimeField('Date updated', auto_now=True,
+    date_created = models.DateTimeField("Date created", auto_now_add=True)
+    date_updated = models.DateTimeField("Date updated", auto_now=True,
                                         db_index=True)
 
     def __str__(self):
