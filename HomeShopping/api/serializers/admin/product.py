@@ -33,6 +33,7 @@ class AdminProductClassSerializer(serializers.ModelSerializer, UpdateRelationMix
         with transaction.atomic():
             updated_instance = super(AdminProductClassSerializer, self).update(instance, validated_data)
             self.update_relation("attributes", updated_instance.attributes, attributes)
+
             return updated_instance
 
 
@@ -51,6 +52,7 @@ class AdminStockRecordsSerializer(serializers.ModelSerializer):
     url = serializers.HyperlinkedIdentityField(view_name='admin-stockrecord-detail')
     product = serializers.PrimaryKeyRelatedField(required=False, queryset=Product.objects)
     partner_sku = serializers.CharField(validators=[], required=True)
+    owner = serializers.HiddenField(default=serializers.CurrentUserDefault())
 
     class Meta:
         list_serializer_class = AdminStockRecordListSerializer
@@ -68,7 +70,11 @@ class AdminStockRecordsSerializer(serializers.ModelSerializer):
 class AdminProductSerializer(BaseProductSerializer, UpdateRelationMixin):
     url = serializers.HyperlinkedIdentityField(view_name='admin-product-detail')
     stockrecords = AdminStockRecordsSerializer(required=False, many=True)
-    category = serializers.SlugRelatedField(slug_field='slug', queryset=ProductCategory.objects, required=False)
+    category = serializers.SlugRelatedField(
+        slug_field='slug',
+        queryset=ProductCategory.objects,
+        required=False,
+    )
 
     class Meta(BaseProductSerializer.Meta):
         fields = '__all__'
@@ -86,6 +92,10 @@ class AdminProductSerializer(BaseProductSerializer, UpdateRelationMixin):
     def update(self, instance, validated_data):
         attribute_values = validated_data.pop('attribute_values', None)
         stockrecords = validated_data.pop('stockrecords', None)
+        if stockrecords:
+            stockrecords = [
+                dict(stockrecord, owner=self.context['request'].user) for stockrecord in stockrecords
+            ]
         with transaction.atomic():
             instance = super().update(instance, validated_data)
             product_class = instance.get_product_class()

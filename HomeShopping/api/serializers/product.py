@@ -78,11 +78,12 @@ class ProductAttributeValueSerializer(serializers.ModelSerializer):
         queryset=Product.objects,
         required=False,
     )
-    value = AttributeValueField()
     code = serializers.CharField(
         source='attribute.code',
         read_only=True,
     )
+    value = AttributeValueField()
+
     name = serializers.CharField(
         source='attribute.name',
         required=False,
