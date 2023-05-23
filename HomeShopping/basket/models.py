@@ -31,7 +31,7 @@ class Basket(models.Model):
     date_submitted = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
-        return "%(status)s basket %(pk)" % {'status': self.status, 'pk': self.pk}
+        return f'{self.status}s basket {self.pk}'
 
     def freeze(self):
         """
@@ -149,10 +149,6 @@ class BasketLine(models.Model):
     @property
     def line_price(self):
         return self.quantity * self.stockrecord.price
-
-    # @property
-    # def line_price(self):
-    #     return self.quantity * self.product.price
 
     @property
     def available_quantity(self):

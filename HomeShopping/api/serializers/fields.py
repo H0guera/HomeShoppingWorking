@@ -1,6 +1,7 @@
 import operator
 
 from django.core.exceptions import ValidationError
+
 from rest_framework import relations, serializers
 
 from api.serializers.exceptions import FieldError
@@ -83,7 +84,6 @@ class AttributeValueField(serializers.Field):
             product = self.root.instance
             updated_dictionary = dict(dictionary, product=product)
             return updated_dictionary
-            #dictionary['product'] = product
         return dictionary
 
     def to_internal_value(self, data):
@@ -91,8 +91,6 @@ class AttributeValueField(serializers.Field):
 
         try:
             code, value = attribute_details(data)
-            # value = data.get('value', None)
-            # code = data.get('code', None)
             internal_value = value
 
             if 'product_class' in data and data['product_class'] is not None and data['product_class'] != '':
@@ -102,7 +100,7 @@ class AttributeValueField(serializers.Field):
             elif 'product' in data:
                 attribute = ProductAttribute.objects.get(
                     code=code,
-                    product_class=data.get('product').get_product_class()
+                    product_class=data.get('product').get_product_class(),
                 )
 
             if attribute.required and value is None:
@@ -126,22 +124,12 @@ class AttributeValueField(serializers.Field):
                 )
             return {'value': internal_value, 'attribute': attribute}
         except ProductAttribute.DoesNotExist:
-            # if (
-            #         "product_class" in data
-            #         and "parent" in data
-            #         and data["product_class"] is None
-            #         and data["parent"] is None
-            # ):
-            #     self.fail("child_without_parent")
-            # else:
-                self.fail("attribute_missing", **data)
+            self.fail("attribute_missing", **data)
         except KeyError as e:
             (field_name,) = e.args
             raise FieldError(
-                detail={field_name: self.error_messages["required"]}, code="required"
+                detail={field_name: self.error_messages["required"]}, code="required",
             )
 
     def to_representation(self, value):
         return value.value
-
-

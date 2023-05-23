@@ -70,10 +70,10 @@ class TestBasket(APITest):
             'add-product',
             product="http://testserver/api/products/3/",
             quantity=1,
-            stockrecord = "http://testserver/api/products/1/stockrecords/1/",
+            stockrecord="http://testserver/api/products/1/stockrecords/1/",
         )
         self.response.assertStatusEqual(406)
-        self.response.assertValueEqual('reason',  {'non_field_errors':["Incorrect stockrecord"]})
+        self.response.assertValueEqual('reason',  {'non_field_errors': ["Incorrect stockrecord"]})
         # basket is not saved for anonymous user
         self.response = self.get('api-basket')
         self.response.assertStatusEqual(200)
@@ -232,7 +232,6 @@ class TestBasket(APITest):
         self.login('nobody', 'nobody')
         self.response = self.get('api-basket')
         self.response.assertStatusEqual(200)
-        #expect quantity=6 because add_quantity=False
         self.response = self.get(self.response['lines'])
         line0 = self.response[0]
         self.assertEqual(line0['quantity'], 6)
@@ -305,4 +304,3 @@ class TestBasket(APITest):
         self.assertEqual(first_line['price'], '20.00')
         self.assertEqual(second_line['quantity'], 2)
         self.assertEqual(second_line['price'], '10.00')
-

@@ -86,7 +86,7 @@ class AdminProductSerializer(BaseProductSerializer, UpdateRelationMixin):
             self.instance = instance = super().create(validated_data)
             return self.update(
                 instance,
-                dict(validated_data, attribute_values=attribute_values, stockrecords=stockrecords)
+                dict(validated_data, attribute_values=attribute_values, stockrecords=stockrecords),
             )
 
     def update(self, instance, validated_data):
@@ -104,13 +104,8 @@ class AdminProductSerializer(BaseProductSerializer, UpdateRelationMixin):
 
             if self.partial:
                 for attribute_value in instance.attribute_values.exclude(
-                        attribute__product_class=product_class
+                        attribute__product_class=product_class,
                 ):
                     attribute_value.delete()
 
         return instance._meta.model.objects.get(pk=instance.pk)
-
-
-
-
-

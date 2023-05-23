@@ -45,12 +45,10 @@ class BasketMiddleware:
             response.delete_cookie(cookie_key)
 
         if not hasattr(request, 'basket'):
-            print('1')
             return response
 
         # If the basket was never initialized we can safely return
         if (isinstance(request.basket, SimpleLazyObject) and request.basket._wrapped is empty):
-            print('2')
             return response
 
         cookie_key = self.get_cookie_key(request)
@@ -61,7 +59,6 @@ class BasketMiddleware:
         # then we need to assign it to a cookie
         if (request.basket.id and not request.user.is_authenticated
                 and not has_basket_cookie):
-            print('yes')
             cookie = self.get_basket_hash(request.basket.id)
             response.set_cookie(
                 cookie_key, cookie,
@@ -85,20 +82,16 @@ class BasketMiddleware:
         Return the open basket for this request
         """
         if request._basket_cache is not None:
-            print('from basket_cache')
             return request._basket_cache
 
         num_baskets_merged = 0
         manager = Basket.open
         cookie_key = self.get_cookie_key(request)
-        print(cookie_key)
-        cookie_basket = self.get_cookie_basket(cookie_key, request)  # manager)
-        #print(cookie_basket)
+        cookie_basket = self.get_cookie_basket(cookie_key, request)
         if hasattr(request, 'user') and request.user.is_authenticated:
             # Signed-in user: if they have a cookie basket too, it means
             # that they have just signed in and we need to merge their cookie
             # basket into their user basket, then delete the cookie.
-            print('auth')
             try:
                 basket, __ = manager.get_or_create(owner=request.user)
             except Basket.MultipleObjectsReturned:
@@ -115,24 +108,20 @@ class BasketMiddleware:
             basket.owner = request.user
 
             if cookie_basket:
-                print('merging')
                 self.merge_baskets(basket, cookie_basket)
                 num_baskets_merged += 1
                 request.cookies_to_delete.append(cookie_key)
 
         elif cookie_basket:
-            print('cookie_basket')
             # Anonymous user with a basket tied to the cookie
             basket = cookie_basket
         else:
-            print('No')
             # Anonymous user with no basket - instantiate a new basket
             # instance.  No need to save yet.
             basket = Basket()
 
         # Cache basket instance for the during of this request
         request._basket_cache = basket
-        #print(request._basket_cache)
 
         return basket
 
@@ -147,7 +136,6 @@ class BasketMiddleware:
         # """
         basket = None
         if cookie_key in request.COOKIES:
-            print('get_cookie_baSKET')
             basket_hash = request.COOKIES[cookie_key]
             try:
                 basket_id = Signer().unsign(basket_hash)

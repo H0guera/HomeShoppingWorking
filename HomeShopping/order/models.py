@@ -16,8 +16,8 @@ class ShippingAddress(models.Model):
     notes = models.TextField(
         blank=True,
         verbose_name='Instructions',
-        help_text="Tell us anything we should know when delivering "
-                    "your order.")
+        help_text="Tell us anything we should know when delivering your order.",
+    )
 
     def __str__(self):
         return f'{self.first_name}, {self.last_name}, {self.line1}'
@@ -31,7 +31,7 @@ class ShippingAddress(models.Model):
 
 
 class Order(models.Model):
-    number = models.CharField( max_length=128, db_index=True, unique=True)
+    number = models.CharField(max_length=128, db_index=True, unique=True)
     total = models.DecimalField(decimal_places=2, max_digits=12)
     guest_email = models.EmailField(blank=True)
     date_placed = models.DateTimeField(db_index=True, auto_now_add=True)
@@ -106,4 +106,3 @@ class OrderLineAttribute(models.Model):
 
     def __str__(self):
         return "%s = %s" % (self.type, self.value)
-

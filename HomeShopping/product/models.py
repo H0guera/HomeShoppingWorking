@@ -71,10 +71,6 @@ class Product(models.Model):
             raise ValidationError(f'Categories is forbidden for {self.structure} product')
 
     def save(self, *args, **kwargs):
-        # if not self.id:
-        #     self.article = f"{self.title}"
-        #     if self.is_child:
-        #         self.article = f"{self.parent.article}{self.parent.id + 1}"
         self.clean()
         super().save(*args, **kwargs)
 
@@ -150,9 +146,8 @@ class ProductAttribute(models.Model):
         validators=[
             RegexValidator(
                 regex=r'^[a-zA-Z_][0-9a-zA-Z_]*$',
-                message=
-                    "Code can only contain the letters a-z, A-Z, digits, "
-                    "and underscores, and can't start with a digit."
+                message="Code can only contain the letters a-z, A-Z, digits, "
+                "and underscores, and can't start with a digit.",
             ),
         ],
     )
@@ -290,7 +285,7 @@ class StockRecord(models.Model):
 
     def clean(self):
         if self.product.is_parent:
-            raise ValidationError(f'Stockrecords is forbidden for parent product')
+            raise ValidationError('Stockrecords is forbidden for parent product')
 
     @property
     def net_stock_level(self):

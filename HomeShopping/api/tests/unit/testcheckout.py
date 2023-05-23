@@ -202,7 +202,6 @@ class CheckoutTest(APITest):
         self.response = self.client.get(url)
         self.response.assertStatusEqual(404)  # Frozen basket can not be accessed
 
-
     def test_checkout_a_product_with_different_stockrecords(self):
         self.login('nobody', 'nobody')
         self.response = self.post(

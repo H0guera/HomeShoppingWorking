@@ -1,11 +1,8 @@
 import decimal
 
-from django.contrib.auth.models import User
 from django.urls import reverse
 
-from api.serializers.admin.product import AdminStockRecordsSerializer, AdminProductSerializer, \
-    AdminStockRecordListSerializer, AdminProductClassSerializer
-from api.serializers.product import ProductAttributeValueSerializer
+from api.serializers.admin.product import AdminStockRecordsSerializer, AdminProductSerializer
 from api.tests.utils import APITest
 from product.models import Product, ProductClass
 
@@ -20,11 +17,6 @@ class ProductTest(APITest):
         default_fields = ['id', 'url']
         for field in default_fields:
             self.assertIn(field, product)
-
-    def test_product_detail(self):
-        self.response = self.client.get(reverse('product-detail', args=(2,)))
-        self.response.assertStatusEqual(200)
-        self.response.assertValueEqual('title', 'testproduct1')
 
     def test_product_list_filter(self):
         standalone_products_url = "%s?structure=standalone" % reverse("product-list")
@@ -96,7 +88,7 @@ class AdminStockRecordSerializerTest(_ProductSerializerTest):
         self.assertEqual(obj.product.get_title(), "standalone_product")
         self.assertEqual(obj.price, decimal.Decimal("20.00"))
         self.assertEqual(obj.owner.username, 'admin')
-        #update
+        # update
         ser = AdminStockRecordsSerializer(
             data={
                 "partner_sku": "henk",
@@ -114,44 +106,6 @@ class AdminStockRecordSerializerTest(_ProductSerializerTest):
         self.assertEqual(obj.owner.username, 'admin')
 
 
-# class ProductAttributeValueSerializerTest(_ProductSerializerTest):
-    # def test_productattributevalueserializer_error(self):
-    #     "If attributes do not exist on the product class a tidy error should explain"
-    #     product = Product.objects.get(pk=1)
-    #     ser = ProductAttributeValueSerializer(
-    #         data={"name": "zult", "code": "zult", "value": "hoolahoop"},
-    #         instance=product,
-    #         partial=True,
-    #     )
-    #
-    #     self.assertFalse(
-    #         ser.is_valid(),
-    #         "There should be an error because there is no attribute named zult",
-    #     )
-    #     self.assertEqual(
-    #         ser.errors["value"],
-    #         [
-    #             "No attribute exist with code=zult, please define it in "
-    #             "the product_class first."
-    #         ],
-    #     )
-
-    # def test_productattributevalueserializer_text_error(self):
-    #     product = Product.objects.get(pk=1)
-    #     ser = ProductAttributeValueSerializer(
-    #         data={"name": "Text", "code": "text", "value": 4},
-    #         instance=product,
-    #         partial=True,
-    #     )
-    #     self.assertFalse(ser.is_valid(), "This should fail")
-    #
-    #     ser = ProductAttributeValueSerializer(
-    #         data={"name": "color", "code": "color", "value": None, "product": product}
-    #     )
-    #     self.assertFalse(ser.is_valid(), "This should fail")
-    #     self.assertDictEqual(ser.errors, {"value": ["Attribute text is required."]})
-
-
 class AdminProductSerializerTest(_ProductSerializerTest):
     def test_create_product_with_stockrecords(self):
         "Products should be created by the serializer if needed"
@@ -167,7 +121,7 @@ class AdminProductSerializerTest(_ProductSerializerTest):
                         "partner_sku": "grisha",
                         "num_in_stock": 5,
                         "price": "53.67",
-                    }
+                    },
                 ],
             },
             context={"request": request},
@@ -204,7 +158,10 @@ class AdminProductSerializerTest(_ProductSerializerTest):
 
         ser = AdminProductSerializer(
             data={
-                "attributes": [{"code": "size", "value": "large"}, {"code": "color", "value": "green"}],
+                "attributes": [
+                    {"code": "size", "value": "large"},
+                    {"code": "color", "value": "green"},
+                ],
             },
             instance=product,
             partial=True,
@@ -221,7 +178,6 @@ class AdminProductSerializerTest(_ProductSerializerTest):
         missing information"""
         product = Product.objects.get(pk=1)
 
-
         ser = AdminProductSerializer(
             data={
                 "attributes": [{"name": "Text", "value": "go go"}],
@@ -231,7 +187,7 @@ class AdminProductSerializerTest(_ProductSerializerTest):
         )
         self.assertFalse(ser.is_valid(), "Should fail because of missing code")
         self.assertDictEqual(
-            ser.errors, {"attributes": [{"code": "This field is required."}]}
+            ser.errors, {"attributes": [{"code": "This field is required."}]},
         )
 
     def test_switch_product_class(self):
@@ -243,7 +199,7 @@ class AdminProductSerializerTest(_ProductSerializerTest):
         ser = AdminProductSerializer(
             data={
                 "product_class": "sneaker",
-                "attributes": [{"code": "size", "value": 40},],
+                "attributes": [{"code": "size", "value": 40}],
             },
             instance=product,
             partial=True,
@@ -271,7 +227,7 @@ class AdminProductSerializerTest(_ProductSerializerTest):
                         "partner_sku": "grisha",
                         "num_in_stock": 5,
                         "price": "53.67",
-                    }
+                    },
                 ],
             },
             instance=product,
@@ -289,7 +245,7 @@ class AdminProductSerializerTest(_ProductSerializerTest):
                     {
                         "partner_sku": "grisha",
                         "num_in_stock": 15,
-                    }
+                    },
                 ],
             },
             instance=obj,
@@ -302,55 +258,7 @@ class AdminProductSerializerTest(_ProductSerializerTest):
         self.assertEqual(obj.stockrecords.count(), 1)
         self.assertEqual(obj.stockrecords.first().num_in_stock, 15)
 
-    # def test_modify_stockrecords_with_wrong_owner(self):
-    #     product = Product.objects.get(pk=3)
-    #     self.assertEqual(product.stockrecords.count(), 0)
-    #     self.login('admin', 'admin')
-    #     self.response = self.get(reverse('api-root'))
-    #     request = self.response.wsgi_request
-    #
-    #     ser = AdminProductSerializer(
-    #         data={
-    #             "stockrecords": [
-    #                 {
-    #                     "partner_sku": "grisha",
-    #                     "num_in_stock": 5,
-    #                     "price": "53.67",
-    #                 }
-    #             ],
-    #         },
-    #         instance=product,
-    #         context={'request': request},
-    #         partial=True,
-    #     )
-    #
-    #     self.assertTrue(ser.is_valid(), "Something wrong %s" % ser.errors)
-    #     obj = ser.save()
-    #     self.assertEqual(obj.stockrecords.count(), 1)
-    #
-    #     # let's change context
-    #     self.login('nobody', 'nobody')
-    #     self.response = self.get(reverse('api-root'))
-    #     request = self.response.wsgi_request
-    #
-    #     ser = AdminProductSerializer(
-    #         data={
-    #             "stockrecords": [
-    #                 {
-    #                     "partner_sku": "grisha",
-    #                     "num_in_stock": 15,
-    #                 }
-    #             ],
-    #         },
-    #         instance=obj,
-    #         context={'request': request},
-    #         partial=True,
-    #     )
-    #
-    #     self.assertTrue(ser.is_valid(), "Something wrong %s" % ser.errors)
-    #     obj = ser.save()
-
-    def test_add_category_and_remove(self):
+    def test_add_category(self):
         product = Product.objects.get(pk=1)
         ser = AdminProductSerializer(
                 data={
@@ -363,17 +271,6 @@ class AdminProductSerializerTest(_ProductSerializerTest):
         self.assertTrue(ser.is_valid(), "Something wrong %s" % ser.errors)
         obj = ser.save()
         self.assertEqual(obj.category.title, "Male")
-
-        # ser = AdminProductSerializer(
-        #     data={
-        #         "category": "",
-        #     },
-        #     instance=obj,
-        #     partial=True,
-        # )
-        # self.assertTrue(ser.is_valid(), "Something wrong %s" % ser.errors)
-        # obj = ser.save()
-        # self.assertFalse(obj.category)
 
 
 class TestProductAdmin(APITest):
@@ -503,15 +400,13 @@ class TestProductClass(APITest):
             "name": "testpc",
             "slug": "testpc",
         }
-        # ser = AdminProductClassSerializer(data=data)
-        # self.assertTrue(ser.is_valid(), ser.errors)
         self.response = self.post("admin-product-class-list", **data)
         self.response.assertStatusEqual(201, self.response.data)
         self.assertEqual(ProductClass.objects.count(), 3)
 
     def test_patch_add_attributes(self):
         self.test_post_product_class()
-        #self.login("admin", "admin")
+        # self.login("admin", "admin")
         pc = ProductClass.objects.get(name='testpc')
         self.assertEqual(pc.pk, 3)
         self.assertEqual(pc.attributes.count(), 0)

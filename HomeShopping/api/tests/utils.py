@@ -19,9 +19,6 @@ class APITest(TestCase):
             is_staff=True,
             is_superuser=True,
         )
-        # user.is_stuff = True
-        # user.is_superuser = True
-        # user.save()
 
         user = User.objects.create_user(
             id=2,

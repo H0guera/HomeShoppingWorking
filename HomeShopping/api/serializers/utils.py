@@ -49,8 +49,3 @@ class UpdateRelationMixin:
             manager.exclude(pk__in=current_pks).delete()
         else:
             manager.set(updated_values)
-
-
-
-
-
