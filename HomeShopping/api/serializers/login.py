@@ -21,13 +21,13 @@ class LoginSerializer(serializers.Serializer):
         required=True,
     )
     password = serializers.CharField(
-        max_length=field_length("password"),
+        max_length=field_length('password'),
         required=True,
-        style={"input_type": "password"},
+        style={'input_type': 'password'},
     )
 
     def validate(self, attrs):
-        user = authenticate(username=attrs["username"], password=attrs["password"])
+        user = authenticate(username=attrs['username'], password=attrs['password'])
         if user is None:
             raise serializers.ValidationError("invalid login")
         elif not user.is_active:

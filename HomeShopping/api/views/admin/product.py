@@ -1,4 +1,4 @@
-from rest_framework import generics, status
+from rest_framework import generics
 from rest_framework.permissions import IsAdminUser
 
 from api.serializers.admin.product import AdminStockRecordsSerializer, AdminProductClassSerializer, \
@@ -19,7 +19,7 @@ class ProductAttributeAdminList(generics.ListCreateAPIView):
             if isinstance(data, list):
                 kwargs["many"] = True
 
-        return super(ProductAttributeAdminList,self).get_serializer(*args, **kwargs)
+        return super(ProductAttributeAdminList, self).get_serializer(*args, **kwargs)
 
 
 class ProductAttributeAdminDetail(generics.RetrieveUpdateDestroyAPIView):

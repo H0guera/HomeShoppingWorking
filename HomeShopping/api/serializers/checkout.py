@@ -17,7 +17,7 @@ class ShippingAddressSerializer(serializers.HyperlinkedModelSerializer):
 class InlineShippingAddressSerializer(serializers.ModelSerializer):
     class Meta:
         model = ShippingAddress
-        fields = "__all__"
+        fields = '__all__'
 
 
 class OrderLineAttributeSerializer(serializers.HyperlinkedModelSerializer):
@@ -27,10 +27,10 @@ class OrderLineAttributeSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class OrderLineSerializer(serializers.HyperlinkedModelSerializer):
-    url = serializers.HyperlinkedIdentityField(view_name="orderline-detail")
+    url = serializers.HyperlinkedIdentityField(view_name='orderline-detail')
     stockrecord = DrillDownHyperlinkedRelatedField(
-        view_name="product-stockrecord-detail",
-        extra_url_kwargs={"product_pk": "product_id"},
+        view_name='product-stockrecord-detail',
+        extra_url_kwargs={'product_pk': 'product_id'},
         queryset=StockRecord.objects.all(),
     )
     product = ProductSerializer(read_only=True)
@@ -46,9 +46,9 @@ class OrderLineSerializer(serializers.HyperlinkedModelSerializer):
 
 class OrderSerializer(serializers.HyperlinkedModelSerializer):
     owner = serializers.HyperlinkedRelatedField(
-        view_name="user-detail",
+        view_name='user-detail',
         read_only=True,
-        source="user",
+        source='user',
     )
     shipping_address = InlineShippingAddressSerializer(many=False, required=False)
     email = serializers.EmailField(read_only=True)
@@ -61,7 +61,7 @@ class OrderSerializer(serializers.HyperlinkedModelSerializer):
 
 class CheckoutSerializer(serializers.Serializer, OrderPlacementMixin):
     basket = serializers.HyperlinkedRelatedField(
-        view_name="basket-detail",
+        view_name='basket-detail',
         queryset=Basket.objects,
     )
     guest_email = serializers.EmailField(allow_blank=True, required=False)
@@ -70,7 +70,7 @@ class CheckoutSerializer(serializers.Serializer, OrderPlacementMixin):
 
     @property
     def request(self):
-        return self.context["request"]
+        return self.context['request']
 
     def validate(self, attrs):
         request = self.request
@@ -80,13 +80,13 @@ class CheckoutSerializer(serializers.Serializer, OrderPlacementMixin):
                 message = "Guest email is required for anonymous checkouts"
                 raise serializers.ValidationError(message)
 
-        basket = attrs.get("basket")
+        basket = attrs.get('basket')
         if basket.num_items() <= 0:
             message = "Cannot checkout with empty basket"
             raise serializers.ValidationError(message)
         total = basket.total_price
 
-        attrs["order_total"] = total
+        attrs['order_total'] = total
         return attrs
 
     def create(self, validated_data):
@@ -95,7 +95,7 @@ class CheckoutSerializer(serializers.Serializer, OrderPlacementMixin):
             order_number = self.generate_order_number(basket)
             request = self.request
             if 'shipping_address' in validated_data:
-                shipping_address = ShippingAddress(**validated_data["shipping_address"])
+                shipping_address = ShippingAddress(**validated_data['shipping_address'])
             else:
                 shipping_address = None
             return self.place_order(

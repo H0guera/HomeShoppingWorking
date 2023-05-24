@@ -55,7 +55,6 @@ class LoginView(APIView):
         return Response("")
 
 
-
 class UserDetail(generics.RetrieveAPIView):
     serializer_class = UserSerializer
     permission_classes = (IsAuthenticated,)

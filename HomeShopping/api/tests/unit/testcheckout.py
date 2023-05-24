@@ -45,10 +45,10 @@ class CheckoutTest(APITest):
         request = rf.post("/checkout", **payload)
         request.user = User.objects.get(username="nobody")
 
-        serializer = CheckoutSerializer(data=payload, context={"request": request})
+        serializer = CheckoutSerializer(data=payload, context={'request': request})
         self.assertTrue(serializer.is_valid())
-        self.assertEqual(serializer.validated_data["total"], Decimal("50.00"))
-        self.assertEqual(serializer.validated_data["order_total"], Decimal("30.00"))
+        self.assertEqual(serializer.validated_data['total'], Decimal('50.00'))
+        self.assertEqual(serializer.validated_data['order_total'], Decimal('30.00'))
 
     def test_checkout(self):
         self.login('nobody', 'nobody')
@@ -60,7 +60,7 @@ class CheckoutTest(APITest):
         self.response.assertStatusEqual(406)
         # when basket is empty, checkout should raise an error
         self.response.assertValueEqual(
-            "non_field_errors",
+            'non_field_errors',
             ["Cannot checkout with empty basket"],
         )
 
@@ -73,7 +73,7 @@ class CheckoutTest(APITest):
         self.response.assertStatusEqual(200)
 
 #        let's try to change total price for order
-        payload["order_total"] = 50
+        payload['order_total'] = 50
         self.response = self.post('api-checkout', **payload)
         self.response.assertStatusEqual(200)
         self.response.assertValueEqual('email', 'nobody@nobody.nbd')
@@ -106,15 +106,15 @@ class CheckoutTest(APITest):
         self.response = self.post('api-checkout', **payload)
         print(self.response.data)
         self.response.assertValueEqual(
-            "non_field_errors",
+            'non_field_errors',
             ["Guest email is required for anonymous checkouts"],
         )
         self.response.assertStatusEqual(406)
         self.assertEqual(ShippingAddress.objects.count(), 0)
 
         # An empty email address should say this as well
-        payload["guest_email"] = ""
-        response = self.post("api-checkout", **payload)
+        payload['guest_email'] = ''
+        response = self.post('api-checkout', **payload)
         self.assertEqual(response.status_code, 406)
 
         self.response = self.get('api-basket')
@@ -193,7 +193,7 @@ class CheckoutTest(APITest):
         self.response.assertStatusEqual(200)
         self.assertEqual(
             Basket.objects.get(pk=basket["id"]).status,
-            "Frozen",
+            'Frozen',
             "Basket should be frozen after placing order and before payment",
         )
 
@@ -201,7 +201,6 @@ class CheckoutTest(APITest):
 
         self.response = self.client.get(url)
         self.response.assertStatusEqual(404)  # Frozen basket can not be accessed
-
 
     def test_checkout_a_product_with_different_stockrecords(self):
         self.login('nobody', 'nobody')

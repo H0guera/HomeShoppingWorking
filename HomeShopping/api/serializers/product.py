@@ -64,7 +64,6 @@ class ProductAttributeValueListSerializer(UpdateListSerializer):
 
     def select_existing_item(self, manager, datum):
         try:
-            #return manager.get(attribute__name=datum['name'])#attribute__code=datum['code'], attribute__name=datum['name'])
             return manager.get(attribute=datum['attribute'])
         except manager.model.DoesNotExist:
             pass
@@ -114,7 +113,6 @@ class ProductAttributeValueSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         data = deepcopy(validated_data)
-        #data.update(product=instance.product)
         return self.update_or_create(data)
 
     class Meta:
@@ -125,8 +123,8 @@ class ProductAttributeValueSerializer(serializers.ModelSerializer):
 
 class ProductStockRecordSerializer(serializers.ModelSerializer):
     url = DrillDownHyperlinkedIdentityField(
-        view_name="product-stockrecord-detail",
-        extra_url_kwargs={"product_pk": "product_id"},
+        view_name='product-stockrecord-detail',
+        extra_url_kwargs={'product_pk': 'product_id'},
     )
 
     class Meta:
@@ -149,24 +147,12 @@ class BaseProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
 
-    # def validate(self, attrs):
-    #     if "structure" in attrs and "parent" in attrs:
-    #         if attrs["structure"] == Product.CHILD and attrs["parent"] is None:
-    #             raise serializers.ValidationError("child without parent")
-    #     if "structure" in attrs and "product_class" in attrs:
-    #         if attrs["product_class"] is None and attrs["structure"] != Product.CHILD:
-    #             raise serializers.ValidationError("product_class can not be empty for structure %(structure)s"
-    #                 % attrs
-    #             )
-
-        # return super(BaseProductSerializer, self).validate(attrs)
-
 
 class ChildProductSerializer(BaseProductSerializer):
     "Serializer for child products"
-    url = serializers.HyperlinkedIdentityField(view_name="product-detail")
+    url = serializers.HyperlinkedIdentityField(view_name='product-detail')
     parent = serializers.HyperlinkedRelatedField(
-        view_name="product-detail",
+        view_name='product-detail',
         queryset=Product.objects.filter(structure=Product.PARENT),
     )
 
@@ -176,17 +162,9 @@ class ChildProductSerializer(BaseProductSerializer):
 
 
 class ProductSerializer(BaseProductSerializer):
-    url = serializers.HyperlinkedIdentityField(view_name="product-detail")
-    # price = serializers.DecimalField(
-    #     decimal_places=2,
-    #     max_digits=12,
-    #     source='stockrecords.price',
-    # )
+    url = serializers.HyperlinkedIdentityField(view_name='product-detail')
     children = ChildProductSerializer(many=True, required=False)
     stockrecords = ProductStockRecordSerializer(many=True, required=False)
-    # stockrecords = serializers.HyperlinkedIdentityField(
-    #     view_name="product-stockrecords", read_only=True
-    # )
 
     class Meta(BaseProductSerializer.Meta):
         fields = '__all__'
@@ -194,9 +172,8 @@ class ProductSerializer(BaseProductSerializer):
 
 class AddProductSerializer(serializers.Serializer):
     quantity = serializers.IntegerField(required=True)
-    #product = serializers.PrimaryKeyRelatedField(queryset=Product.objects, required=True)
     product = serializers.HyperlinkedRelatedField(
-        view_name="product-detail",
+        view_name='product-detail',
         queryset=Product.objects,
         required=True,
     )
@@ -207,5 +184,5 @@ class AddProductSerializer(serializers.Serializer):
 
     def validate(self, attrs):
         if attrs['product'].id != attrs['stockrecord'].product_id:
-            raise serializers.ValidationError('Incorrect stockrecord')
+            raise serializers.ValidationError("Incorrect stockrecord")
         return attrs

@@ -2,14 +2,18 @@ from django.contrib.auth.models import User
 
 from rest_framework import serializers
 
-from api.serializers.fields import DrillDownHyperlinkedIdentityField, DrillDownHyperlinkedRelatedField
+from api.serializers.fields import DrillDownHyperlinkedIdentityField
 from api.serializers.product import ProductSerializer
 
 from basket.models import Basket, BasketLine
 
 
 class BasketSerializer(serializers.HyperlinkedModelSerializer):
-    lines = serializers.HyperlinkedIdentityField(view_name="basket-lines-list", many=False, read_only=True)
+    lines = serializers.HyperlinkedIdentityField(
+        view_name='basket-lines-list',
+        many=False,
+        read_only=True,
+    )
     total_price = serializers.DecimalField(
         decimal_places=2,
         max_digits=12,
@@ -36,15 +40,10 @@ class BasketSerializer(serializers.HyperlinkedModelSerializer):
 
 class BasketLineSerializer(serializers.HyperlinkedModelSerializer):
     url = DrillDownHyperlinkedIdentityField(
-        view_name="basket-line-detail",
-        extra_url_kwargs={"basket_pk": "basket.id"},
+        view_name='basket-line-detail',
+        extra_url_kwargs={'basket_pk': 'basket.id'},
     )
     product = ProductSerializer(read_only=True)
-    # stockrecord = DrillDownHyperlinkedRelatedField(
-    #     view_name='product-stockrecord-detail',
-    #     extra_url_kwargs={"product_pk": "product_id"},
-    #     queryset=StockRecord.objects.all(),
-    # )
     price = serializers.DecimalField(
         decimal_places=2,
         max_digits=12,
@@ -52,17 +51,11 @@ class BasketLineSerializer(serializers.HyperlinkedModelSerializer):
         read_only=True,
     )
     allowed_quantity = serializers.IntegerField(source='stockrecord.net_stock_level', read_only=True)
-    # price = serializers.DecimalField(
-    #     decimal_places=2,
-    #     max_digits=12,
-    #     source="line_price",
-    #     read_only=True,
-    # )
 
     def validate(self, attrs):
         line = self.instance
-        if attrs["quantity"] > line.available_quantity:
-            message = f"Cannot buy this quantity."
+        if attrs['quantity'] > line.available_quantity:
+            message = "Cannot buy this quantity."
             raise serializers.ValidationError(message)
         return attrs
 

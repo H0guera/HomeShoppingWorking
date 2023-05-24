@@ -32,7 +32,7 @@ class AdminProductClassSerializer(serializers.ModelSerializer, UpdateRelationMix
         attributes = validated_data.pop('attributes', None)
         with transaction.atomic():
             updated_instance = super(AdminProductClassSerializer, self).update(instance, validated_data)
-            self.update_relation("attributes", updated_instance.attributes, attributes)
+            self.update_relation('attributes', updated_instance.attributes, attributes)
 
             return updated_instance
 
@@ -61,9 +61,9 @@ class AdminStockRecordsSerializer(serializers.ModelSerializer):
 
     def validate(self, attrs):
         if not attrs.get('partner_sku', None):
-            raise serializers.ValidationError('A partner sku field is required')
+            raise serializers.ValidationError("A partner sku field is required")
         elif attrs.get('partner_sku') == '':
-            raise serializers.ValidationError('A partner sku field cant be blank')
+            raise serializers.ValidationError("A partner sku field cant be blank")
         return attrs
 
 
@@ -86,7 +86,7 @@ class AdminProductSerializer(BaseProductSerializer, UpdateRelationMixin):
             self.instance = instance = super().create(validated_data)
             return self.update(
                 instance,
-                dict(validated_data, attribute_values=attribute_values, stockrecords=stockrecords)
+                dict(validated_data, attribute_values=attribute_values, stockrecords=stockrecords),
             )
 
     def update(self, instance, validated_data):
@@ -104,13 +104,8 @@ class AdminProductSerializer(BaseProductSerializer, UpdateRelationMixin):
 
             if self.partial:
                 for attribute_value in instance.attribute_values.exclude(
-                        attribute__product_class=product_class
+                        attribute__product_class=product_class,
                 ):
                     attribute_value.delete()
 
         return instance._meta.model.objects.get(pk=instance.pk)
-
-
-
-
-

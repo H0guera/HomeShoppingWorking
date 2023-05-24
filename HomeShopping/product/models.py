@@ -5,11 +5,11 @@ from django.db import models
 
 
 class Product(models.Model):
-    STANDALONE, PARENT, CHILD = 'standalone', 'parent', 'child'
+    STANDALONE, PARENT, CHILD = "standalone", "parent", "child"
     STRUCTURE_CHOICES = (
-        (STANDALONE, 'Stand-alone product'),
-        (PARENT, 'Parent product'),
-        (CHILD, 'Child product'),
+        (STANDALONE, "Stand-alone product"),
+        (PARENT, "Parent product"),
+        (CHILD, "Child product"),
     )
     structure = models.CharField(
         max_length=10,
@@ -26,18 +26,18 @@ class Product(models.Model):
         null=True,
         on_delete=models.SET_NULL)
     attributes = models.ManyToManyField(
-        'ProductAttribute',
+        "ProductAttribute",
         through='ProductAttributeValue',
     )
     parent = models.ForeignKey(
-        'self',
+        "self",
         blank=True,
         null=True,
         on_delete=models.CASCADE,
         related_name='children',
     )
     product_class = models.ForeignKey(
-        'ProductClass',
+        "ProductClass",
         null=True,
         blank=True,
         on_delete=models.PROTECT,
@@ -51,30 +51,26 @@ class Product(models.Model):
 
     def _clean_standalone(self):
         if not self.title:
-            raise ValidationError(f'Title is required for {self.structure} product')
+            raise ValidationError(f"Title is required for {self.structure} product")
         if not self.product_class:
-            raise ValidationError(f'A product class is required for {self.structure} product')
+            raise ValidationError(f"A product class is required for {self.structure} product")
         if self.parent_id:
-            raise ValidationError(f'Parent is forbidden for {self.structure} product')
+            raise ValidationError(f"Parent is forbidden for {self.structure} product")
 
     def _clean_parent(self):
         self._clean_standalone()
 
     def _clean_child(self):
         if not self.parent_id:
-            raise ValidationError(f'Parent is required for {self.structure} product')
+            raise ValidationError(f"Parent is required for {self.structure} product")
         if self.parent_id and not self.parent.is_parent:
             raise ValidationError("You can only assign child products to parent products.")
         if self.product_class:
-            raise ValidationError(f'A product class is forbidden for {self.structure} product')
+            raise ValidationError(f"A product class is forbidden for {self.structure} product")
         if self.category:
-            raise ValidationError(f'Categories is forbidden for {self.structure} product')
+            raise ValidationError(f"Categories is forbidden for {self.structure} product")
 
     def save(self, *args, **kwargs):
-        # if not self.id:
-        #     self.article = f"{self.title}"
-        #     if self.is_child:
-        #         self.article = f"{self.parent.article}{self.parent.id + 1}"
         self.clean()
         super().save(*args, **kwargs)
 
@@ -150,9 +146,8 @@ class ProductAttribute(models.Model):
         validators=[
             RegexValidator(
                 regex=r'^[a-zA-Z_][0-9a-zA-Z_]*$',
-                message=
-                    "Code can only contain the letters a-z, A-Z, digits, "
-                    "and underscores, and can't start with a digit."
+                message="Code can only contain the letters a-z, A-Z, digits, "
+                "and underscores, and can't start with a digit.",
             ),
         ],
     )
@@ -160,8 +155,8 @@ class ProductAttribute(models.Model):
     TEXT = 'text'
     INTEGER = 'integer'
     TYPE_CHOICES = (
-        (TEXT, 'Text'),
-        (INTEGER, 'Integer'),
+        (TEXT, "Text"),
+        (INTEGER, "Integer"),
     )
     type = models.CharField(
         choices=TYPE_CHOICES,
@@ -206,11 +201,11 @@ class ProductAttribute(models.Model):
 
     def _validate_text(self, value):
         if not isinstance(value, str):
-            raise ValidationError('Must be str')
+            raise ValidationError("Must be str")
 
     def _validate_integer(self, value):
         if not isinstance(value, int):
-            raise ValidationError('Must be integer')
+            raise ValidationError("Must be integer")
 
 
 class ProductAttributeValue(models.Model):
@@ -272,13 +267,13 @@ class StockRecord(models.Model):
     partner_sku = models.CharField(max_length=55, unique=True)
     price = models.FloatField(validators=(MinValueValidator(limit_value=0.01),))
     num_in_stock = models.PositiveIntegerField(
-        'Number in stock', blank=True, null=True)
+        "Number in stock", blank=True, null=True)
 
     low_stock_threshold = models.PositiveIntegerField(
-        'Low Stock Threshold', blank=True, null=True)
+        "Low Stock Threshold", blank=True, null=True)
 
-    date_created = models.DateTimeField('Date created', auto_now_add=True)
-    date_updated = models.DateTimeField('Date updated', auto_now=True,
+    date_created = models.DateTimeField("Date created", auto_now_add=True)
+    date_updated = models.DateTimeField("Date updated", auto_now=True,
                                         db_index=True)
 
     def __str__(self):
@@ -290,7 +285,7 @@ class StockRecord(models.Model):
 
     def clean(self):
         if self.product.is_parent:
-            raise ValidationError(f'Stockrecords is forbidden for parent product')
+            raise ValidationError("Stockrecords is forbidden for parent product")
 
     @property
     def net_stock_level(self):

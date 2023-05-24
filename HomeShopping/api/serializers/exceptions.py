@@ -2,7 +2,7 @@ from rest_framework.exceptions import _get_error_details
 
 
 class FieldError(Exception):
-    default_code = "field_error"
+    default_code = 'field_error'
 
     def __init__(self, detail, code=None):
         if code is None:

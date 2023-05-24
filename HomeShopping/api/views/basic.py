@@ -9,8 +9,6 @@ class BasketList(generics.ListAPIView):
     serializer_class = BasketSerializer
     queryset = editable_baskets()
 
-    # permission_classes = (RequestAllowAccessTo,)
-
     def get_queryset(self):
         basket = self.request.basket
         return self.queryset.filter(id=basket.id)

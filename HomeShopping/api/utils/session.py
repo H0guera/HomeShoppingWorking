@@ -54,7 +54,7 @@ def login_and_upgrade_session(request, user):
 
         # Mark the new session as owned by the user we are logging in.
         request.session[auth.SESSION_KEY] = user.pk
-        if hasattr(user, "get_session_auth_hash"):  # django 1.7
+        if hasattr(user, 'get_session_auth_hash'):  # django 1.7
             request.session[auth.HASH_SESSION_KEY] = user.get_session_auth_hash()
 
     # now login so the session can be used for authentication purposes.

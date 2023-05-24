@@ -13,7 +13,6 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-import product.apps
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -90,7 +89,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    },
 }
 
 
@@ -136,9 +135,22 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = {
-    'EXCEPTION_HANDLER': 'api.exceptions.django_error_handler'
+    'EXCEPTION_HANDLER': 'api.exceptions.django_error_handler',
 }
 
 MY_BASKET_COOKIE_LIFETIME = 7 * 24 * 60 * 60
 MY_BASKET_COOKIE_SECURE = False
 MY_BASKET_COOKIE_OPEN = 'open_basket'
+
+LOGGING = {
+    'version': 1,
+    'handlers': {
+        'console': {'class': 'logging.StreamHandler'},
+    },
+    'loggers': {
+        'django.db.backends': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+        },
+    },
+}

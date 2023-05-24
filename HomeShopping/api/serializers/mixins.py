@@ -20,10 +20,6 @@ class OrderPlacementMixin:
         if Order.objects.filter(number=order_number).exists():
             raise ValueError("There is already an order with number %s"
                              % order_number)
-        if 'request' not in kwargs:
-            request = getattr(self, 'request', None)
-        else:
-            request = kwargs.pop('request')
 
         with transaction.atomic():
             shipping_address = self.create_shipping_address(shipping_address)
@@ -66,8 +62,7 @@ class OrderPlacementMixin:
             'order': order,
             'product': basket_line.product,
             'quantity': basket_line.quantity,
-            'stockrecord': basket_line.stockrecord
-            #'stockrecord': basket_line.product.stockrecords.get(product=basket_line.product)
+            'stockrecord': basket_line.stockrecord,
         }
         order_line = OrderLine(**line_data)
         order_line.save()
@@ -79,7 +74,6 @@ class OrderPlacementMixin:
                                               value=attr.productattributevalue_set.get(id=attr.id))
 
     def update_stock_records(self, basket_line):
-        #stockrecord = basket_line.product.stockrecords.get(product=basket_line.product)
         stockrecord = basket_line.stockrecord
         stockrecord.num_in_stock -= basket_line.quantity
         stockrecord.save()

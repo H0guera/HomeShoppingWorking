@@ -58,4 +58,3 @@ class CheckoutView(views.APIView):
             resp = response.Response(o_ser.data)
             return resp
         return response.Response(c_ser.errors, status.HTTP_406_NOT_ACCEPTABLE)
-

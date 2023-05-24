@@ -32,28 +32,12 @@ class AddProductView(APIView):
         else:
             desired_quantity = quantity
 
-        #if desired_quantity > product.allowed_quantity:
         if desired_quantity > stockrecord.num_in_stock:
             if stockrecord.num_in_stock < 1:
                 message = 'This product is not available to buy now'
                 return False, message
-            message = f'This quantity is not allowed.'
+            message = "This quantity is not allowed."
             return False, message
-        return True, None
-
-    # def validate(self, basket, product, quantity, stockrecord):
-    #
-    #     current_quantity = basket.current_quantity(product)
-    #     desired_quantity = current_quantity + quantity
-    #
-    #     #if desired_quantity > product.allowed_quantity:
-    #     if desired_quantity > stockrecord.num_in_stock:
-    #         if product.allowed_quantity == 0:
-    #             message = "This product is not available to buy"
-    #             return False, message
-    #         message = f'This quantity is not allowed.Allowed quantity is {product.allowed_quantity}'
-    #         return False, message
-    #     return True, None
 
     def post(self, request, *args, **kwargs):
         p_ser = self.add_product_serializer_class(data=request.data, context={"request": request})

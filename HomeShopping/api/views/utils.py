@@ -1,7 +1,6 @@
 from rest_framework.generics import get_object_or_404
 
 from api.permissions import RequestAllowsAccessTo
-
 from basket.models import Basket
 
 
