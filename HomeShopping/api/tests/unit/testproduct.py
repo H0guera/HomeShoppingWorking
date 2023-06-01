@@ -8,6 +8,7 @@ from product.models import Product, ProductClass
 
 
 class ProductTest(APITest):
+
     def test_get(self):
         url = reverse('product-list')
         self.response = self.get(url)

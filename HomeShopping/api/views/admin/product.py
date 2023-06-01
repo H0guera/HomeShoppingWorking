@@ -1,10 +1,11 @@
+from django.db.models import Prefetch
 from rest_framework import generics
 from rest_framework.permissions import IsAdminUser
 
 from api.serializers.admin.product import AdminStockRecordsSerializer, AdminProductClassSerializer, \
     AdminProductSerializer, AdminCategorySerializer
 from api.serializers.product import ProductAttributeSerializer
-from product.models import ProductAttribute, ProductClass, StockRecord, Product, ProductCategory
+from product.models import ProductAttribute, ProductClass, StockRecord, Product, ProductCategory, ProductAttributeValue
 
 
 class ProductAttributeAdminList(generics.ListCreateAPIView):
@@ -54,7 +55,14 @@ class ProductStockRecordsAdminDetail(generics.RetrieveUpdateDestroyAPIView):
 
 class ProductAdminList(generics.ListCreateAPIView):
     serializer_class = AdminProductSerializer
-    queryset = Product.objects.get_queryset()
+    queryset = Product.objects.all().select_related('product_class', 'category').prefetch_related(
+        'stockrecords',
+        Prefetch('attribute_values', queryset=ProductAttributeValue.objects.all().select_related('attribute')),
+        Prefetch('children', queryset=Product.objects.all().select_related('product_class').prefetch_related(
+            Prefetch('attribute_values', queryset=ProductAttributeValue.objects.all().select_related('attribute')),
+        ),
+                 ),
+    )
     permission_classes = (IsAdminUser,)
 
 

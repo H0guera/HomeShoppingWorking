@@ -14,7 +14,6 @@ class BasketView(APIView):
     serializer_class = BasketSerializer
 
     def get(self, request, *args, **kwargs):  # pylint: disable=redefined-builtin
-
         basket = request.basket
         ser = self.serializer_class(basket, context={"request": request})
         return Response(ser.data)
@@ -38,6 +37,7 @@ class AddProductView(APIView):
                 return False, message
             message = "This quantity is not allowed."
             return False, message
+        return True, None
 
     def post(self, request, *args, **kwargs):
         p_ser = self.add_product_serializer_class(data=request.data, context={"request": request})

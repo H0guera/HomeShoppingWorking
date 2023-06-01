@@ -74,7 +74,7 @@ class ProductAttributeValueListSerializer(UpdateListSerializer):
 
 class ProductAttributeValueSerializer(serializers.ModelSerializer):
     product = serializers.PrimaryKeyRelatedField(
-        queryset=Product.objects,
+        queryset=Product.objects.all().select_related('attributes'),
         required=False,
     )
     code = serializers.CharField(

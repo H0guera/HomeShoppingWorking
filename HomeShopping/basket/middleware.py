@@ -1,7 +1,8 @@
 from django.core.signing import BadSignature, Signer
+from django.db.models import Prefetch
 from django.utils.functional import SimpleLazyObject, empty
 
-from basket.models import Basket
+from basket.models import Basket, BasketLine
 
 from HomeShopping import settings
 
@@ -48,7 +49,8 @@ class BasketMiddleware:
             return response
 
         # If the basket was never initialized we can safely return
-        if (isinstance(request.basket, SimpleLazyObject) and request.basket._wrapped is empty):
+        if (isinstance(request.basket, SimpleLazyObject) and
+                request.basket._wrapped is empty):
             return response
 
         cookie_key = self.get_cookie_key(request)
@@ -85,7 +87,8 @@ class BasketMiddleware:
             return request._basket_cache
 
         num_baskets_merged = 0
-        manager = Basket.open
+        manager = Basket.open.select_related('owner').prefetch_related(Prefetch(
+            'lines', queryset=BasketLine.objects.all().select_related('stockrecord')))
         cookie_key = self.get_cookie_key(request)
         cookie_basket = self.get_cookie_basket(cookie_key, request)
         if hasattr(request, 'user') and request.user.is_authenticated:

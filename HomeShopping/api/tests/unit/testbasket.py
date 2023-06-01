@@ -97,7 +97,7 @@ class TestBasket(APITest):
         self.response = self.get(lines)
         self.response.assertStatusEqual(200)
         line0 = self.response.body[0]
-        self.assertEqual(line0['product']['id'], 1)
+        self.assertEqual(line0['product'], 'http://testserver/api/products/1/')
         self.assertEqual(line0['quantity'], 4)
 
     def test_add_product_authenticated(self):
@@ -118,7 +118,7 @@ class TestBasket(APITest):
         self.response = self.get(lines)
         self.response.assertStatusEqual(200)
         line0 = self.response.body[0]
-        self.assertEqual(line0['product']['id'], 1)
+        self.assertEqual(line0['product'], 'http://testserver/api/products/1/')
         self.assertEqual(line0['quantity'], 4)
 
     def test_basket_line_permissions(self):

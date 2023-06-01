@@ -1,11 +1,18 @@
+from django.db.models import Prefetch
 from rest_framework import generics
 
 from api.serializers.product import CategorySerializer, ProductStockRecordSerializer, ProductSerializer
-from product.models import ProductCategory, StockRecord, Product
+from product.models import ProductCategory, StockRecord, Product, ProductAttributeValue
 
 
 class ProductList(generics.ListAPIView):
-    queryset = Product.objects.all()
+    queryset = Product.objects.all().select_related('product_class').prefetch_related(
+        'stockrecords',
+        Prefetch('attribute_values', queryset=ProductAttributeValue.objects.select_related('attribute')),
+        Prefetch('children', queryset=Product.objects.all().prefetch_related(
+            Prefetch('attribute_values', queryset=ProductAttributeValue.objects.all().select_related('attribute')),
+        )),
+    )
     serializer_class = ProductSerializer
 
     def get_queryset(self):
@@ -28,7 +35,13 @@ class ProductList(generics.ListAPIView):
 
 
 class ProductDetail(generics.RetrieveAPIView):
-    queryset = Product.objects.all()
+    queryset = Product.objects.all().select_related('product_class').prefetch_related(
+        Prefetch('attribute_values', queryset=ProductAttributeValue.objects.all().select_related('attribute')),
+        Prefetch('children', queryset=Product.objects.all().prefetch_related(
+            Prefetch('attribute_values', queryset=ProductAttributeValue.objects.all().select_related('attribute')),
+        ),
+                 ),
+    )
     serializer_class = ProductSerializer
 
 

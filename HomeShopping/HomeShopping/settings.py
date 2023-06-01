@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'basket.apps.BasketConfig',
     'order.apps.OrderConfig',
     'api.apps.ApiConfig',
+    #'debug_toolbar',
 ]
 
 MIDDLEWARE = [
@@ -53,6 +54,7 @@ MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
 
     'basket.middleware.BasketMiddleware',
+    #'debug_toolbar.middleware.DebugToolbarMiddleware',
 
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -154,3 +156,5 @@ LOGGING = {
         },
     },
 }
+
+INTERNAL_IPS = ['127.0.0.1']

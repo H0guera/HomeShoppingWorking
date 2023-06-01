@@ -3,8 +3,6 @@ from django.contrib.auth.models import User
 from rest_framework import serializers
 
 from api.serializers.fields import DrillDownHyperlinkedIdentityField
-from api.serializers.product import ProductSerializer
-
 from basket.models import Basket, BasketLine
 
 
@@ -43,7 +41,6 @@ class BasketLineSerializer(serializers.HyperlinkedModelSerializer):
         view_name='basket-line-detail',
         extra_url_kwargs={'basket_pk': 'basket.id'},
     )
-    product = ProductSerializer(read_only=True)
     price = serializers.DecimalField(
         decimal_places=2,
         max_digits=12,
@@ -67,4 +64,7 @@ class BasketLineSerializer(serializers.HyperlinkedModelSerializer):
             'product',
             'quantity',
             'allowed_quantity',
+        )
+        read_only_fields = (
+            'product',
         )
