@@ -7,21 +7,56 @@ services:
     volumes:
       - ./HomeShopping:/HomeShopping
 
-    environment:
-      - DB_HOST=database
-      - DB_NAME=dbname
-      - DB_USER=dbuser
-      - DB_PASS=pass
+#    environment:
+#      - DB_HOST=database
+#      - DB_NAME=dbname
+#      - DB_USER=dbuser
+#      - DB_PASS=pass
 
     command: >
       sh -c "python manage.py runserver 0.0.0.0:8000"
 
+  redis:
+    image: redis:7.0.5-alpine
+    hostname: redis
     depends_on:
-      - database
+      - web-app
+
+  worker:
+    build:
+      context: .
+    hostname: worker
+    entrypoint: celery
+    command: -A celery_app.app worker --loglevel=info
+    volumes:
+      - ./HomeShopping:/HomeShopping
+    links:
+      - redis
+    depends_on:
+      - redis
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#    depends_on:
+#      - database
       
-  database:
-    image: postgres:14.6-alpine
-    environment:
-      - POSTGRES_DB=dbname
-      - POSTGRES_USER=dbuser
-      - POSTGRES_PASSWORD=pass
+#  database:
+#    image: postgres:14.6-alpine
+#    environment:
+#      - POSTGRES_DB=dbname
+#      - POSTGRES_USER=dbuser
+#      - POSTGRES_PASSWORD=pass
