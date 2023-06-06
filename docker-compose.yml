@@ -14,7 +14,7 @@ services:
 #      - DB_PASS=pass
 
     command: >
-      sh -c "python manage.py runserver 0.0.0.0:8000"
+      sh -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
 
   redis:
     image: redis:7.0.5-alpine
@@ -22,17 +22,32 @@ services:
     depends_on:
       - web-app
 
-  worker:
+  celery-worker:
     build:
       context: .
     hostname: worker
     entrypoint: celery
-    command: -A celery_app.app worker --loglevel=info
+    command: -A celery_app.app worker --loglevel=info #&& celery -A HomeShopping beat -l INFO --scheduler django_celery_beat.schedulers:DatabaseScheduler
     volumes:
       - ./HomeShopping:/HomeShopping
     links:
       - redis
     depends_on:
+      - redis
+
+  celery-beat:
+    build:
+      context: .
+    hostname: beat
+    entrypoint: celery
+    command: -A HomeShopping beat -l WARNING --scheduler django_celery_beat.schedulers:DatabaseScheduler
+    volumes:
+      - ./HomeShopping:/HomeShopping
+    links:
+      - celery-worker
+      - redis
+    depends_on:
+      - celery-worker
       - redis
 
   flower:

@@ -46,6 +46,8 @@ INSTALLED_APPS = [
     'basket.apps.BasketConfig',
     'order.apps.OrderConfig',
     'api.apps.ApiConfig',
+    'django_celery_results',
+    'django_celery_beat',
     #'debug_toolbar',
 ]
 
@@ -93,17 +95,6 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     },
 }
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'HOST': os.environ.get('DB_HOST'),
-#         'NAME': os.environ.get('DB_NAME'),
-#         'USER': os.environ.get('DB_USER'),
-#         'PASSWORD': os.environ.get('DB_PASS'),
-#     },
-# }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -170,3 +161,17 @@ LOGGING = {
 INTERNAL_IPS = ['127.0.0.1']
 
 CELERY_BROKER_URL = 'redis://redis:6379/0'
+
+CELERY_RESULT_BACKEND = 'django-db'
+
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://redis:6379/1",
+    }
+}
+
+# celery setting.
+CELERY_CACHE_BACKEND = 'default'
+
+CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"

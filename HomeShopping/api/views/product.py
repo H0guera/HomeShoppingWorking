@@ -1,4 +1,6 @@
+from django.core.cache import cache
 from django.db.models import Prefetch
+
 from rest_framework import generics
 
 from api.serializers.product import CategorySerializer, ProductStockRecordSerializer, ProductSerializer
@@ -26,7 +28,13 @@ class ProductList(generics.ListAPIView):
 
             http://127.0.0.1:8000/api/products/?structure=parent
         """
-        qs = super(ProductList, self).get_queryset()
+        qs_cache_name = 'p_list_cache'
+        qs_cache = cache.get(qs_cache_name)
+
+        if qs_cache:
+            qs = qs_cache
+        else:
+            qs = super(ProductList, self).get_queryset()
         structure = self.request.query_params.get("structure")
         if structure is not None:
             return qs.filter(structure=structure)
